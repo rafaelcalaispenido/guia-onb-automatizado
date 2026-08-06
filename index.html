@@ -3019,22 +3019,33 @@
   // ── IFRAME RESIZE: envia altura ao parent para ajuste dinâmico ──
   function notifyHeight() {
     if (!_inIframe) return;
-    // Percorre todos os cards e usa o maior bottom visível (offsetHeight > 0 = visível)
-    var candidates = document.querySelectorAll('.welcome-card, .card');
-    var maxBottom = 0;
-    for (var i = 0; i < candidates.length; i++) {
-      var c = candidates[i];
-      if (c.offsetHeight > 0) {
-        var bottom = c.offsetTop + c.offsetHeight;
-        if (bottom > maxBottom) maxBottom = bottom;
+    var h;
+    var ws = document.getElementById('screen-welcome');
+    var welcomeActive = ws && ws.style.display !== 'none' && !ws.classList.contains('hidden');
+    if (welcomeActive) {
+      // welcome-card está dentro de position:fixed — usa offsetHeight direto, sem offsetTop
+      var wc = document.querySelector('.welcome-card');
+      h = (wc ? wc.offsetHeight : 500) + 32;
+    } else {
+      // card principal está no fluxo normal
+      var card = document.querySelector('.card');
+      if (card && card.offsetHeight > 0) {
+        h = card.offsetTop + card.offsetHeight + 16;
+      } else {
+        h = document.body.offsetHeight + 16;
       }
     }
-    var h = (maxBottom > 0 ? maxBottom : document.body.offsetHeight) + 32;
     window.parent.postMessage({ type: 'resize', height: h }, '*');
   }
-  // Dispara no load e sempre que o conteúdo muda (MutationObserver)
+  // Dispara imediatamente e também após transições CSS (accordion: 350ms)
+  var _notifyTimer = null;
+  function scheduleNotify() {
+    notifyHeight();
+    clearTimeout(_notifyTimer);
+    _notifyTimer = setTimeout(notifyHeight, 380);
+  }
   window.addEventListener('load', notifyHeight);
-  var _resizeObs = new MutationObserver(notifyHeight);
+  var _resizeObs = new MutationObserver(scheduleNotify);
   _resizeObs.observe(document.body, { childList: true, subtree: true, attributes: true });
   window.addEventListener('resize', notifyHeight);
 </script>
