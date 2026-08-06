@@ -567,7 +567,7 @@
       border-radius: 16px;
       width: 100%;
       max-width: 1000px;
-      height: 86vh;
+      height: min(86vh, 700px);
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -1467,6 +1467,11 @@
        ════════════════════════════════════════════════════ */
 
     /* ── TABLET (≤ 768px) ─────────────────────────────────── */
+    /* Quando embutido em iframe: remove min-height e restaura padding para evitar espaço em branco */
+    body.in-iframe { min-height: auto !important; padding: 16px !important; }
+    body.in-iframe .welcome-card { min-height: auto !important; }
+    body.in-iframe .card { min-height: auto !important; }
+
     @media (max-width: 768px) {
       #screen-welcome { padding: 0; }
       .welcome-card { border-radius: 0; max-width: 100%; min-height: 100vh; justify-content: space-between; }
@@ -2479,6 +2484,10 @@
 
   function openTutorial(e) {
     if (e) e.stopPropagation();
+    // Quando dentro de iframe, pede ao parent para scrollar até o topo do iframe
+    if (window !== window.parent) {
+      window.parent.postMessage({ type: 'scrollToIframe' }, '*');
+    }
     tutStep = 0;
     renderTutStep();
     document.getElementById('tutorial-overlay').classList.add('open');
@@ -2993,6 +3002,11 @@
       goToStep(etapa);
     }
   })();
+
+  // ── IFRAME: detecta contexto e ajusta layout ──
+  if (window !== window.parent) {
+    document.body.classList.add('in-iframe');
+  }
 
   // ── IFRAME RESIZE: envia altura ao parent para ajuste dinâmico ──
   function notifyHeight() {
