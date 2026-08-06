@@ -2847,6 +2847,13 @@
       body.classList.add('open');
       acc.classList.add('open');
     }
+
+    // Notifica o parent do novo tamanho em 3 momentos: início, meio e fim da transição CSS (350ms)
+    if (_inIframe) {
+      setTimeout(notifyHeight, 50);
+      setTimeout(notifyHeight, 200);
+      setTimeout(notifyHeight, 400);
+    }
   }
 
   function goToStep(n) {
