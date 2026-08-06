@@ -2993,6 +2993,19 @@
       goToStep(etapa);
     }
   })();
+
+  // ── IFRAME RESIZE: envia altura ao parent para ajuste dinâmico ──
+  function notifyHeight() {
+    var h = document.body.scrollHeight;
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({ type: 'resize', height: h }, '*');
+    }
+  }
+  // Dispara no load e sempre que o conteúdo muda (MutationObserver)
+  window.addEventListener('load', notifyHeight);
+  var _resizeObs = new MutationObserver(notifyHeight);
+  _resizeObs.observe(document.body, { childList: true, subtree: true, attributes: true });
+  window.addEventListener('resize', notifyHeight);
 </script>
 
 </body>
