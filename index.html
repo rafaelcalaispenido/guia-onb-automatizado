@@ -3019,11 +3019,11 @@
   // ── IFRAME RESIZE: envia altura ao parent para ajuste dinâmico ──
   function notifyHeight() {
     if (!_inIframe) return;
-    // Mede pela bounding box do card para evitar espaço fantasma do scrollHeight
+    // offsetTop + offsetHeight dá a altura real do elemento no documento (não depende do viewport)
     var el = document.querySelector('.welcome-card') || document.querySelector('.card');
     var h = el
-      ? Math.ceil(el.getBoundingClientRect().bottom + window.scrollY) + 16
-      : document.body.scrollHeight;
+      ? el.offsetTop + el.offsetHeight + 32
+      : document.documentElement.offsetHeight;
     window.parent.postMessage({ type: 'resize', height: h }, '*');
   }
   // Dispara no load e sempre que o conteúdo muda (MutationObserver)
