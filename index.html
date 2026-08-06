@@ -3019,11 +3019,17 @@
   // ── IFRAME RESIZE: envia altura ao parent para ajuste dinâmico ──
   function notifyHeight() {
     if (!_inIframe) return;
-    // offsetTop + offsetHeight dá a altura real do elemento no documento (não depende do viewport)
-    var el = document.querySelector('.welcome-card') || document.querySelector('.card');
-    var h = el
-      ? el.offsetTop + el.offsetHeight + 32
-      : document.documentElement.offsetHeight;
+    // Percorre todos os cards e usa o maior bottom visível (offsetHeight > 0 = visível)
+    var candidates = document.querySelectorAll('.welcome-card, .card');
+    var maxBottom = 0;
+    for (var i = 0; i < candidates.length; i++) {
+      var c = candidates[i];
+      if (c.offsetHeight > 0) {
+        var bottom = c.offsetTop + c.offsetHeight;
+        if (bottom > maxBottom) maxBottom = bottom;
+      }
+    }
+    var h = (maxBottom > 0 ? maxBottom : document.body.offsetHeight) + 32;
     window.parent.postMessage({ type: 'resize', height: h }, '*');
   }
   // Dispara no load e sempre que o conteúdo muda (MutationObserver)
