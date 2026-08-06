@@ -3004,16 +3004,27 @@
   })();
 
   // ── IFRAME: detecta contexto e ajusta layout ──
-  if (window !== window.parent) {
+  var _inIframe = window !== window.parent;
+  if (_inIframe) {
     document.body.classList.add('in-iframe');
+    // Forçar via JS também para garantir que o CSS seja aplicado antes do primeiro notifyHeight
+    document.body.style.minHeight = 'auto';
+    document.body.style.padding = '16px';
+    var _wc = document.querySelector('.welcome-card');
+    if (_wc) _wc.style.minHeight = 'auto';
+    var _c = document.querySelector('.card');
+    if (_c) _c.style.minHeight = 'auto';
   }
 
   // ── IFRAME RESIZE: envia altura ao parent para ajuste dinâmico ──
   function notifyHeight() {
-    var h = document.body.scrollHeight;
-    if (window.parent && window.parent !== window) {
-      window.parent.postMessage({ type: 'resize', height: h }, '*');
-    }
+    if (!_inIframe) return;
+    // Mede pela bounding box do card para evitar espaço fantasma do scrollHeight
+    var el = document.querySelector('.welcome-card') || document.querySelector('.card');
+    var h = el
+      ? Math.ceil(el.getBoundingClientRect().bottom + window.scrollY) + 16
+      : document.body.scrollHeight;
+    window.parent.postMessage({ type: 'resize', height: h }, '*');
   }
   // Dispara no load e sempre que o conteúdo muda (MutationObserver)
   window.addEventListener('load', notifyHeight);
@@ -3021,5 +3032,6 @@
   _resizeObs.observe(document.body, { childList: true, subtree: true, attributes: true });
   window.addEventListener('resize', notifyHeight);
 </script>
+
 </body>
 </html>
