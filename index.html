@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuração eNotas — Hotmart</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  WELCOME SCREEN                                        -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div id="screen-welcome">
+  <div class="welcome-card">
+    <div class="welcome-header">
+      <img src="images/Logo-Cabecalho.png" alt="eNotas | Hotmart" class="logo-cabecalho">
+      <a href="https://atendimento.enotas.com.br/hc/pt-br/requests/new?ticket_form_id=43180182029581&tf_subject=Ajuda%20Onboarding%20Automatizado&tf_42671641667853=cr_enotas_config_dentro-30-dias&tf_description=Assinale%20qual%20problema%20voc%C3%AA%20est%C3%A1%20enfrentando%3A%3Cbr%3E%3Cbr%3E()%20Configura%C3%A7%C3%A3o%20da%20nota%20fiscal%3Cbr%3E()%20Emiss%C3%A3o%20nota%20teste%3Cbr%3E()%20Integrar%20nova%20plataforma%20de%20vendas%3Cbr%3E()%20Importar%20vendas%20antigas%3Cbr%3E()%20Outro%3A%20Descreva%3Cbr%3E%3Cbr%3ESe%20poss%C3%ADvel%2C%20detalhe%20o%20problema%20enfrentado%2C%20para%20podermos%20lhe%20atender%20da%20maneira%20mais%20assertiva%20poss%C3%ADvel." class="welcome-btn-help" target="_blank">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Ajuda
+      </a>
+    </div>
+    <div class="welcome-body">
+      <p class="welcome-eyebrow">Onboarding · Automatizado</p>
+      <img src="images/Logo-Titulo.png" alt="Guia de Onboarding eNotas" class="welcome-title-img">
+      <p class="welcome-subtitle">Siga as etapas para configurar a sua conta e dar início às emissões automáticas.<span class="auto-anim">
+          <svg class="auto-anim-paper" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+          <svg class="auto-anim-rocket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>
+        </span></p>
+      <button class="welcome-btn-start" onclick="startFlow()">Iniciar</button>
+    </div>
+    <div class="welcome-footer">
+      <span class="welcome-footer-text">© 2026 eNotas — Todos os direitos reservados. | <a href="https://enotas.com.br/termos-de-uso/" target="_blank">Termos e condições de uso</a></span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  CARD                                                  -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="card">
+
+  <!-- TRANSITION OVERLAY -->
+  <div id="step-overlay"></div>
+
+  <!-- HEADER -->
+  <div class="card-header">
+    <img src="images/Logo-Cabecalho.png" alt="eNotas | Hotmart" class="logo-cabecalho">
+    <a href="https://atendimento.enotas.com.br/hc/pt-br/requests/new?ticket_form_id=43180182029581&tf_subject=Ajuda%20Onboarding%20Automatizado&tf_42671641667853=cr_enotas_config_dentro-30-dias&tf_description=Assinale%20qual%20problema%20voc%C3%AA%20est%C3%A1%20enfrentando%3A%3Cbr%3E%3Cbr%3E()%20Configura%C3%A7%C3%A3o%20da%20nota%20fiscal%3Cbr%3E()%20Emiss%C3%A3o%20nota%20teste%3Cbr%3E()%20Integrar%20nova%20plataforma%20de%20vendas%3Cbr%3E()%20Importar%20vendas%20antigas%3Cbr%3E()%20Outro%3A%20Descreva%3Cbr%3E%3Cbr%3ESe%20poss%C3%ADvel%2C%20detalhe%20o%20problema%20enfrentado%2C%20para%20podermos%20lhe%20atender%20da%20maneira%20mais%20assertiva%20poss%C3%ADvel." class="welcome-btn-help" target="_blank">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Ajuda
+    </a>
+  </div>
+
+  <!-- TYPE SELECTION -->
+  <div id="screen-type">
+    <div class="type-inner">
+      <h1 class="type-title">Qual tipo de nota você vai emitir?</h1>
+      <p class="type-subtitle">Escolha o tipo de nota fiscal que melhor se adequa ao seu negócio para continuarmos com a configuração.</p>
+      <div class="type-cards">
+
+        <div class="type-option" id="type-servico" onclick="selectType('servico')">
+          <div class="type-option-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+          <div class="type-option-body">
+            <div class="type-option-title-row">
+              <span class="type-option-title">NFS-e (Serviço)</span>
+              <span class="type-badge">Automatizado</span>
+            </div>
+            <div class="type-option-desc"><span style="color:#111111;">Preenchimento automático por envio de nota já emitida.</span><br><span class="type-option-example">Ex.: Cursos, Mentorias, Vídeo Aulas</span></div>
+          </div>
+          <div class="type-radio"></div>
+        </div>
+
+        <div class="type-divider"><span>Deseja emitir NF-e (Produto) ou Split? <span class="type-divider-info" data-tooltip="NFS-e + NF-e emitidas na mesma venda (Split)."><svg width="13" height="13" viewBox="0 0 26 26"><circle cx="13" cy="13" r="11" fill="none" stroke="#bbbbbb" stroke-width="2"/><text x="13" y="18" font-size="14" font-family="Inter, sans-serif" font-weight="700" fill="#999999" text-anchor="middle">?</text></svg></span></span></div>
+
+        <div class="type-option type-option-simple" id="type-outro" onclick="selectType('outro')">
+          <div class="type-option-body">
+            <span class="type-option-title">Configurar outro tipo de emissão</span>
+          </div>
+          <div class="type-radio"></div>
+        </div>
+
+      </div>
+      <p class="type-error" id="type-error">Selecione uma opção para continuar.</p>
+    </div>
+    <div style="text-align:right;">
+      <button class="type-btn-continue" onclick="confirmType()">Continuar</button>
+    </div>
+  </div>
+
+  <!-- PRODUCT GUIDE -->
+  <div id="screen-product">
+    <h2 class="product-guide-title">Configuração de NF-e (Produto)</h2>
+    <p class="product-guide-subtitle">Configure os ajustes necessários para a emissão de Nota Fiscal de Produto pelo eNotas.</p>
+
+    <!-- certificado digital — adicionar aqui -->
+
+    <!-- endereço padrão — adicionar aqui -->
+
+    <!-- CNPJ da Contabilidade no XML da NF-e -->
+    <div class="config-card">
+      <div class="config-card-header">
+        <div class="config-card-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="5" y="2" width="18" height="24" rx="2.5" fill="#e8e4de" stroke="#bbb8b2" stroke-width="1.2"/>
+            <path d="M17 2 L23 8 L17 8 Z" fill="#ccc9c2" stroke="#bbb8b2" stroke-width="1.2" stroke-linejoin="round"/>
+            <text x="14" y="17" font-size="7" font-family="monospace" font-weight="700" fill="#555" text-anchor="middle">&lt;/&gt;</text>
+            <text x="14" y="23" font-size="5" font-family="Inter, sans-serif" font-weight="700" fill="#888" text-anchor="middle" letter-spacing="0.5">XML</text>
+          </svg>
+        </div>
+        <div class="config-card-title">CNPJ da Contabilidade no XML da NF-e</div>
+      </div>
+      <ol class="config-card-steps">
+        <li>1) Clique em <strong>Empresa</strong>.</li>
+        <li>2) Vá em <strong>Configurar conta</strong> ou <strong>Alterar cadastro</strong>.</li>
+        <li>3) Selecione a engrenagem no canto superior direito (<strong>Ajustes de NFe</strong>).</li>
+        <li>4) Na seção <strong>CNPJ da contabilidade autorizada a baixar o XML da NF-e</strong>, informe o CNPJ da sua contabilidade.</li>
+        <li>5) Clique em <strong>Salvar ajuste de NFe</strong>.</li>
+      </ol>
+      <div class="config-card-gif">
+        <img src="images/gif_9.gif" alt="Demonstração configuração CNPJ contabilidade XML NF-e" style="width:100%;border-radius:8px;border:1px solid #eeeeee;display:block;">
+        <button class="img-zoom-btn" onclick="openLightbox('gif_9.gif')"><svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+    </div>
+
+    <div class="product-guide-footer">
+      <button class="product-ph-btn" onclick="finishGuide()">Concluir</button>
+    </div>
+  </div>
+
+  <!-- STEPPER -->
+  <div class="stepper">
+    <div class="step-item">
+      <div class="step-circle-wrap">
+        <div class="step-circle active" id="circle-1" onclick="navToStep(1)">1</div>
+        <div class="step-tooltip">Credenciamento portal de emissão</div>
+      </div>
+    </div>
+    <div class="step-line" id="line-1"></div>
+    <div class="step-item">
+      <div class="step-circle-wrap">
+        <div class="step-circle inactive" id="circle-2" onclick="navToStep(2)">2</div>
+        <div class="step-tooltip">Preenchimento dos dados fiscais</div>
+      </div>
+    </div>
+    <div class="step-line" id="line-2"></div>
+    <div class="step-item">
+      <div class="step-circle-wrap">
+        <div class="step-circle inactive" id="circle-3" onclick="navToStep(3)">3</div>
+        <div class="step-tooltip">Hora de conferir os dados</div>
+      </div>
+    </div>
+    <div class="step-line" id="line-3"></div>
+    <div class="step-item">
+      <div class="step-circle-wrap">
+        <div class="step-circle inactive" id="circle-4" onclick="navToStep(4)">4</div>
+        <div class="step-tooltip">Configure o envio das suas notas fiscais</div>
+      </div>
+    </div>
+    <div class="step-line" id="line-4"></div>
+    <div class="step-item">
+      <div class="step-circle-wrap">
+        <div class="step-circle inactive" id="circle-5" onclick="navToStep(5)">5</div>
+        <div class="step-tooltip">Emissão nota teste</div>
+      </div>
+    </div>
+    <div class="step-line" id="line-5"></div>
+    <div class="step-item">
+      <div class="step-circle-wrap">
+        <div class="step-circle inactive" id="circle-6" onclick="navToStep(6)">6</div>
+        <div class="step-tooltip">Configurações adicionais</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="card-body">
+
+    <!-- ── CONTENT PANEL ─────────────────────────────── -->
+    <div class="content-panel">
+
+      <!-- STEP 1 -->
+      <div class="step-page active" id="step-1">
+        <p class="step-label">Etapa 1 de 6</p>
+        <h1 class="step-title">Credenciamento portal de emissão NFS-e</h1>
+        <p class="step-subtitle">
+          Nesta etapa, vamos conectar o eNotas ao portal de emissão de NFS-e (Portal Nacional).
+        </p>
+        <p class="step-note" style="padding-left:0;margin-bottom:16px;">Caso ainda não tenha o seu CNPJ credenciado no portal, <button class="link-modal" onclick="openModal('modal-credenciamento')">clique aqui</button>.</p>
+
+        <ul class="info-list">
+          <li>
+            O credenciamento pode ser realizado de duas formas: via <strong>login e senha</strong>
+            de acesso ao Portal Nacional, ou via <strong>certificado digital A1</strong> do seu CNPJ.
+          </li>
+          <li>
+            Para garantir uma comunicação mais segura entre o eNotas e o Portal Nacional,
+            recomendamos o uso do <strong>certificado digital</strong>. <span class="tip-trigger" onclick="openTip2(event)"><span class="tooltip-icon">i</span></span>
+          </li>
+        </ul>
+
+        <div class="img-wrap">
+          <img src="images/img-1.jpg" alt="Opções de autenticação" class="content-img">
+          <button class="img-zoom-btn" onclick="openLightbox('img-1.jpg')"><svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step-page" id="step-2">
+        <p class="step-label">Etapa 2 de 6</p>
+        <h1 class="step-title">Preenchimento dos dados fiscais</h1>
+        <p class="step-subtitle">
+          Agora precisamos configurar os dados fiscais que serão utilizados na emissão
+          das suas notas fiscais pelo eNotas. Esses dados garantem que as notas sejam
+          emitidas corretamente para o seu tipo de serviço.
+        </p>
+
+        <!-- ACCORDION 1 -->
+        <div class="accordion" id="acc-1" onclick="toggleAcc(1)">
+          <div class="accordion-header">
+            <div class="accordion-title">Preenchimento automático <span class="acc-badge">Recomendado</span></div>
+            <svg class="acc-arrow" viewBox="0 0 12 12" fill="none">
+              <path d="M2 4L6 8L10 4" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="accordion-body" id="acc-body-1">
+          <p class="step-note" style="padding-left:0;margin-bottom:14px;">Não sabe como baixar o PDF ou XML de uma nota emitida no Portal Nacional? <button class="link-modal" onclick="openModal('modal-download-nf')">Veja o passo a passo aqui</button>.</p>
+          <ul class="info-list">
+            <li>Última nota emitida deste serviço com até 30 dias.</li>
+            <li>O documento deverá estar legível, importe o documento original. <span class="tip-trigger" onclick="openTip(event)"><span class="tooltip-icon">i</span></span></li>
+            <li>A nota fiscal deverá ter sido emitida pelo Portal Nacional (NFS-e).</li>
+            <li>Após importação do arquivo, será mostrado os campos preenchidos, valide as informações juntamente com a sua contabilidade.</li>
+          </ul>
+          <div class="img-row">
+            <div class="img-wrap-half">
+              <img src="images/img-3.jpg" alt="Importação automática" class="content-img-half">
+              <button class="img-zoom-btn" onclick="openLightbox('img-3.jpg')"><svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACCORDION 2 -->
+        <div class="accordion" id="acc-2" onclick="toggleAcc(2)" style="margin-top:24px;">
+          <div class="accordion-header">
+            <div class="accordion-title">Preenchimento manual</div>
+            <svg class="acc-arrow" viewBox="0 0 12 12" fill="none">
+              <path d="M2 4L6 8L10 4" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="accordion-body" id="acc-body-2">
+          <p class="acc-intro">Entenda cada campo da nota fiscal. <span class="tip-trigger" onclick="openTip3(event)"><span class="tooltip-icon">i</span></span></p>
+          <ul class="info-list">
+            <li>As informações dos dados fiscais deverão ser preenchidas manualmente.</li>
+            <li>Com as informações de uma nota já emitida e com o auxílio da sua contabilidade, siga com o preenchimento.</li>
+          </ul>
+          <div class="img-row">
+            <div class="img-wrap-half">
+              <img src="images/img-4.jpg" alt="Preenchimento manual" class="content-img-half">
+              <button class="img-zoom-btn" onclick="openLightbox('img-4.jpg')"><svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step-page" id="step-3">
+        <p class="step-label">Etapa 3 de 6</p>
+        <h1 class="step-title">Hora de conferir os dados</h1>
+        <p class="step-subtitle">
+          Com as informações já preenchidas no sistema de forma automática ou manual, revise as informações antes de continuar.
+        </p>
+        <ul class="info-list">
+          <li>Em caso de dúvidas referente aos campos preenchidos, consulte a sua contabilidade.</li>
+          <li>Se necessário, poderá realizar a alteração de qualquer informação que foi preenchida.</li>
+        </ul>
+        <div class="img-row">
+          <div class="img-wrap-half">
+            <img src="images/img-5.jpg" alt="Conferência dos dados" class="content-img-half">
+            <button class="img-zoom-btn" onclick="openLightbox('img-5.jpg')"><svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="step-page" id="step-4">
+        <p class="step-label">Etapa 4 de 6</p>
+        <h1 class="step-title">Configure o envio das suas notas fiscais</h1>
+        <p class="step-subtitle">
+          Nesta etapa, selecione como deseja que as vendas feitas na Hotmart, sejam emitidas pelo eNotas.
+        </p>
+        <ul class="info-list">
+          <li>Defina se deseja a <strong>emissão e envio da nota fiscal de forma automática</strong> após cada venda realizada.</li>
+          <li>Configure <strong>quando a nota fiscal deverá ser emitida e enviada</strong> para o seu cliente.</li>
+          <li>Assinale se deseja que os <strong>cancelamentos sejam realizados automaticamente</strong>, em caso de vendas canceladas pelo cliente.</li>
+        </ul>
+        <div class="img-wrap">
+          <img src="images/img-6.jpg" alt="Configuração de envio de notas" class="content-img" style="max-height:280px;object-fit:cover;object-position:top;">
+          <button class="img-zoom-btn" onclick="openLightbox('img-6.jpg')"><svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+        </div>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="step-page" id="step-5">
+        <p class="step-label">Etapa 5 de 6</p>
+        <h1 class="step-title">Emissão nota teste</h1>
+        <p class="step-subtitle">
+          Realizaremos a emissão de uma nota teste com os dados preenchidos, para validar se ficou tudo certinho!
+        </p>
+        <ul class="info-list">
+          <li>Você conseguirá visualizar a nota teste emitida pelo Portal Nacional ou pelo painel do eNotas.</li>
+          <li>Após a emissão, o envio de cancelamento da nota teste emitida, será feito automaticamente.</li>
+        </ul>
+        <div class="img-wrap">
+          <img src="images/img-7.jpg" alt="Emissão de nota teste" class="content-img">
+          <button class="img-zoom-btn" onclick="openLightbox('img-7.jpg')"><svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+        </div>
+
+        <!-- Banner de transição para NF-e Produto (aparece só no modo "ambos") -->
+        <div id="step5-product-banner" style="display:none"></div>
+
+      </div>
+
+      <!-- STEP 6 -->
+      <div class="step-page" id="step-6">
+        <p class="step-label">Etapa 6 de 6</p>
+        <h1 class="step-title">Configurações adicionais</h1>
+        <p class="step-subtitle">
+          Sua configuração principal está concluída! Se quiser explorar recursos extras ou precisar de ajuda com situações específicas, separamos alguns artigos que podem ser úteis.
+        </p>
+
+        <ul class="info-list">
+          <li>Os artigos abaixo cobrem cenários comuns que podem surgir no dia a dia da emissão.</li>
+          <li>Em caso de dúvidas, nossa equipe de suporte está disponível para ajudar.</li>
+        </ul>
+
+        <div class="articles-list">
+
+          <a class="article-card" href="https://atendimento.enotas.com.br/hc/pt-br/articles/35773344529421--Menu-Empresa-Ajustes-de-NFe-Como-configurar-os-tratamentos-de-erro-para-vendas-sem-documento-e-ou-sem-endere%C3%A7o-do-comprador" target="_blank">
+            <div class="article-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div class="article-card-body">
+              <div class="article-card-title">Como configurar tratamentos de erro</div>
+              <div class="article-card-sub">Como configurar os tratamentos de erro para vendas sem documento e/ou sem endereço do comprador</div>
+            </div>
+            <svg class="article-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+
+          <a class="article-card" href="https://atendimento.enotas.com.br/hc/pt-br/articles/35773756727565-Meu-plano-permite-importa%C3%A7%C3%A3o-de-vendas-antigas" target="_blank">
+            <div class="article-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 21 15 21"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            </div>
+            <div class="article-card-body">
+              <div class="article-card-title">Importar vendas antigas antes da contratação do eNotas</div>
+              <div class="article-card-sub">Saiba se o seu plano permite a importação de vendas anteriores à contratação</div>
+            </div>
+            <svg class="article-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+
+          <a class="article-card" href="https://atendimento.enotas.com.br/hc/pt-br/articles/35773776262413--Menu-Gerenciar-Plataformas-de-vendas-meios-de-pagamento-integrados-%C3%A0-eNotas" target="_blank">
+            <div class="article-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7V3M15 7V3"/><path d="M6 7h12v4a6 6 0 0 1-12 0V7z"/><path d="M12 17v4"/></svg>
+            </div>
+            <div class="article-card-body">
+              <div class="article-card-title">Integrar nova plataforma de vendas</div>
+              <div class="article-card-sub">Plataformas de vendas e meios de pagamento integrados à eNotas</div>
+            </div>
+            <svg class="article-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+
+          <a class="article-card" href="https://atendimento.enotas.com.br/hc/pt-br/articles/35773366187533" target="_blank">
+            <div class="article-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            </div>
+            <div class="article-card-body">
+              <div class="article-card-title">Como criar uma nota fiscal manualmente pelo eNotas</div>
+              <div class="article-card-sub">Aprenda a emitir uma nota de forma manual diretamente na plataforma</div>
+            </div>
+            <svg class="article-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+
+          <a class="article-card" href="https://atendimento.enotas.com.br/hc/pt-br/articles/35773348743565" target="_blank">
+            <div class="article-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </div>
+            <div class="article-card-body">
+              <div class="article-card-title">Configurar o tipo de nota para cada produto</div>
+              <div class="article-card-sub">Defina qual tipo de nota fiscal será emitida para cada produto</div>
+            </div>
+            <svg class="article-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+
+        </div>
+
+        <!-- Banner de transição para NF-e Produto (aparece só no modo "ambos") -->
+        <div id="step5-product-banner">
+          <div class="banner-title">Próximo passo: configurar NF-e (Produto)</div>
+          <div class="banner-text">Você optou por emitir os dois tipos de nota. Agora vamos partir para a configuração da Nota Fiscal de Produto.</div>
+          <button class="banner-btn" onclick="goToProductGuide()">Vamos lá →</button>
+        </div>
+
+      </div>
+
+    </div><!-- /content-panel -->
+
+    <!-- ── SIDEBAR ─────────────────────────────────────── -->
+    <div class="sidebar">
+      <p class="sidebar-label">Progresso</p>
+
+      <div class="sb-step">
+        <div class="sb-step-row">
+          <div class="sb-icon" id="sb-icon-1">
+            <svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="sb-text active" id="sb-text-1">Credenciamento portal de emissão NFS-e</span>
+        </div>
+        <img src="images/Progresso-1.jpg" alt="NFS-e" class="sb-img visible" id="sb-img-1">
+      </div>
+
+      <div class="sb-step">
+        <div class="sb-step-row">
+          <div class="sb-icon" id="sb-icon-2">
+            <svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#cccccc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="sb-text" id="sb-text-2">Preenchimento dos dados fiscais</span>
+        </div>
+        <img src="images/Progresso-2.jpg" alt="Dados fiscais" class="sb-img" id="sb-img-2">
+      </div>
+
+      <div class="sb-step">
+        <div class="sb-step-row">
+          <div class="sb-icon" id="sb-icon-3">
+            <svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#cccccc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="sb-text" id="sb-text-3">Hora de conferir os dados</span>
+        </div>
+        <img src="images/Progresso-3.jpg" alt="Preenchimento" class="sb-img" id="sb-img-3">
+      </div>
+
+      <div class="sb-step">
+        <div class="sb-step-row">
+          <div class="sb-icon" id="sb-icon-4">
+            <svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#cccccc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="sb-text" id="sb-text-4">Configure o envio das suas notas fiscais</span>
+        </div>
+        <img src="images/Progresso-4.jpg" alt="Configuração envio" class="sb-img" id="sb-img-4">
+      </div>
+
+      <div class="sb-step">
+        <div class="sb-step-row">
+          <div class="sb-icon" id="sb-icon-5">
+            <svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#cccccc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="sb-text" id="sb-text-5">Emissão nota teste</span>
+        </div>
+        <img src="images/Progresso-5.jpg" alt="Nota teste" class="sb-img" id="sb-img-5">
+      </div>
+
+      <div class="sb-step">
+        <div class="sb-step-row">
+          <div class="sb-icon" id="sb-icon-6">
+            <svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#cccccc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="sb-text" id="sb-text-6">Configurações adicionais</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /card-body -->
+
+  <!-- FOOTER -->
+  <div class="card-footer">
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill" style="width: 50%"></div>
+    </div>
+    <div class="footer-buttons">
+      <button class="btn-back" id="btn-back" onclick="prevStep()">Voltar</button>
+      <button class="btn-next" id="btn-next" onclick="nextStep()">Continuar</button>
+    </div>
+  </div>
+
+</div><!-- /card -->
+
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  MODAL 1 — Credenciamento Portal Nacional              -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-credenciamento">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">Como credenciar sua empresa no Portal Nacional</span>
+      <button class="modal-close" onclick="closeModal('modal-credenciamento')">×</button>
+    </div>
+    <div class="modal-body">
+      <p>
+        Para que a emissão de NFS-e Nacional ocorra, é necessário que a empresa realize
+        o credenciamento no Portal Nacional. Em caso de dúvidas sobre aspectos fiscais,
+        consulte a sua contabilidade.
+      </p>
+      <ol class="modal-steps">
+        <li><span>Acesse o <a href="https://www.nfse.gov.br/EmissorNacional/Login?ReturnUrl=%2fEmissorNacional" target="_blank">Portal de Gestão NFS-e</a>.</span></li>
+        <li><span>Clique em <strong>"Fazer primeiro acesso"</strong>.</span></li>
+        <li><span>Selecione a opção <strong>"CNPJ"</strong>, preencha as informações solicitadas e clique em <strong>"Avançar"</strong>.</span></li>
+        <li><span>Se você realizou a declaração de IRPF, será solicitado o número do recibo. Caso contrário, será pedido o número do seu título de eleitor. Preencha e clique em <strong>"Avançar"</strong>.</span></li>
+        <li><span>Informe o e-mail para receber o código de autenticação e a senha que deseja utilizar para acessar o Portal Nacional e clique em <strong>"Avançar"</strong>.</span></li>
+        <li><span>Acesse seu e-mail e copie o código numérico enviado para validar o cadastro.</span></li>
+        <li><span>Cole o código no campo indicado e clique em <strong>"Avançar"</strong>.</span></li>
+        <li><span>Clique em <strong>"Fazer login"</strong>.</span></li>
+        <li><span>Informe os dados que utilizou para criar o acesso e clique em <strong>"Entrar"</strong>.</span></li>
+        <li><span>Clique no ícone de engrenagem (⚙️) na parte superior direita da tela.</span></li>
+        <li><span>Preencha os campos de e-mail e telefone.</span></li>
+        <li><span>Verifique com a contabilidade da empresa qual opção deve ser assinalada no campo referente às informações de tributos destacados na nota fiscal.</span></li>
+        <li><span>Clique em <strong>"Salvar"</strong>.</span></li>
+      </ol>
+      <div class="img-wrap" style="max-width:420px;margin-top:16px;">
+        <img src="images/gif-1.gif" alt="Demonstração do credenciamento" style="width:100%;border-radius:8px;border:1px solid #eeeeee;display:block;">
+        <button class="img-zoom-btn" onclick="openLightbox('gif-1.gif')"><svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+    </div>
+    <div class="modal-footer-btn">
+      <button onclick="closeModal('modal-credenciamento')">Entendido, voltar ao guia</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  MODAL 2 — Como baixar PDF ou XML do Portal Nacional  -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-download-nf">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">Como baixar o PDF ou XML de uma nota emitida</span>
+      <button class="modal-close" onclick="closeModal('modal-download-nf')">×</button>
+    </div>
+    <div class="modal-body">
+      <p>
+        Para utilizar o preenchimento automático dos dados fiscais no eNotas, você precisará
+        de uma nota fiscal emitida nos últimos 30 dias. Veja abaixo como localizá-la e fazer
+        o download diretamente no Portal Nacional:
+      </p>
+      <ol class="modal-steps">
+        <li><span>Acesse o <a href="https://www.nfse.gov.br/EmissorNacional/Login?ReturnUrl=%2fEmissorNacional" target="_blank">Portal de Gestão NFS-e</a> e faça login com suas credenciais.</span></li>
+        <li><span>No menu que está no canto superior direito, clique em <strong>"NFS-e Emitidas"</strong>.</span></li>
+        <li><span>Localize a nota fiscal emitida nos últimos 30 dias com o serviço que será utilizado no eNotas.</span></li>
+        <li><span>Clique nos três pontinhos que estão à direita.</span></li>
+        <li><span>Para baixar o PDF: clique no botão <strong>"Download DANFS-e"</strong> e salve o arquivo em seu computador.</span></li>
+        <li><span>Para baixar o XML: clique em <strong>"Download XML"</strong> e salve o arquivo.</span></li>
+        <li><span>Com o arquivo em mãos, volte ao eNotas e utilize a opção <strong>"Importar nota fiscal"</strong> para carregar os dados automaticamente.</span></li>
+      </ol>
+      <div class="img-wrap" style="max-width:420px;margin-top:16px;">
+        <img src="images/gif-2.gif" alt="Demonstração de download da nota fiscal" style="width:100%;border-radius:8px;border:1px solid #eeeeee;display:block;">
+        <button class="img-zoom-btn" onclick="openLightbox('gif-2.gif')"><svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+    </div>
+    <div class="modal-footer-btn">
+      <button onclick="closeModal('modal-download-nf')">Entendido, voltar ao guia</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  MODAL 3 — Redirecionamento para configuração externa  -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-redirect">
+  <div class="modal-box" style="max-width:420px;">
+    <div class="modal-header">
+      <span class="modal-title">Você será redirecionado a outro link</span>
+      <button class="modal-close" onclick="closeModal('modal-redirect')">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin-bottom:0;">
+        Para configurar esse tipo de emissão, você será direcionado ao
+        Guia de Configurações eNotas em uma nova página.
+      </p>
+    </div>
+    <div class="modal-footer-btn">
+      <button onclick="goToExternalConfig()">OK</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  LIGHTBOX                                              -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox(event)">
+  <div class="lightbox-inner">
+    <img src="" id="lightbox-img" alt="Imagem ampliada">
+    <button class="lightbox-close" onclick="closeLightbox()">×</button>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="tip-overlay" id="tip-overlay" onclick="closeTip(event)">
+  <div class="tip-popup" id="tip-popup">
+    <div class="tip-popup-inner">
+      <span class="tip-popup-text">Se for tirada uma foto do documento original, pode ser que o sistema não faça a leitura correta.</span>
+      <button class="tip-popup-close" onclick="closeTip(event)">×</button>
+    </div>
+  </div>
+</div>
+
+<div class="tip-overlay" id="tip-overlay-2" onclick="closeTip2(event)">
+  <div class="tip-popup">
+    <div class="tip-popup-inner">
+      <span class="tip-popup-text" style="white-space:normal;">Caso ainda não possua um certificado digital,<br>você pode adquirir o seu <a href="https://enotas.com.br/certificado/" target="_blank" style="color:#111111;font-weight:600;">clicando aqui</a>.</span>
+      <button class="tip-popup-close" onclick="closeTip2(event)">×</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  TUTORIAL CAMPOS FISCAIS                               -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="tutorial-overlay" id="tutorial-overlay" onclick="closeTutorial(event)">
+  <div class="tutorial-box" onclick="event.stopPropagation()">
+
+    <!-- HEADER -->
+    <div class="tutorial-header">
+      <div class="tutorial-header-left">
+        <span class="tutorial-badge">Tutorial</span>
+        <span class="tutorial-step-label" id="tut-step-label">Passo 1 de 6</span>
+      </div>
+      <div class="tutorial-header-title" id="tut-header-title">Inscrição Municipal</div>
+      <button class="tut-btn-fullscreen" id="tut-btn-fullscreen" onclick="toggleTutorialFullscreen()" title="Tela cheia">
+        <svg id="tut-fs-icon-expand" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+        <svg id="tut-fs-icon-compress" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" style="display:none"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>
+      </button>
+      <button class="tutorial-close" onclick="closeTutorial()">×</button>
+    </div>
+
+    <!-- BODY: 3 columns -->
+    <div class="tutorial-body">
+
+      <!-- COL 1: eNotas PDF form -->
+      <div class="tut-col-form">
+        <div class="tut-form-wrap" id="tut-form-wrap">
+          <img src="images/Preenchimento_Manual.jpg" alt="Formulário eNotas" class="tut-form-img" id="tut-form-img">
+          <div class="tut-form-highlight" id="tut-form-hl"></div>
+          <!-- CALIBRATION OVERLAY — remove after calibrating -->
+          <div id="calib-box" style="display:none;position:absolute;inset:0;z-index:99;cursor:crosshair;" onclick="calibClick(event)"></div>
+          <div id="calib-info" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111;color:#fff;font-family:monospace;font-size:13px;padding:10px 18px;border-radius:8px;z-index:9999;white-space:pre;pointer-events:none;"></div>
+        </div>
+      </div>
+
+      <!-- COL 2: Nota Fiscal zoomed -->
+      <div class="tut-col-nf" style="position:relative;">
+        <div class="tut-nf-label">Localização na Nota Fiscal</div>
+        <div class="tut-nf-zoom-wrap" id="tut-nf-zoom-wrap">
+          <img src="images/nota_fiscal.jpg" alt="Nota Fiscal" class="tut-nf-zoom-img" id="tut-nf-zoom-img">
+          <div class="tut-nf-hl" id="tut-nf-hl"></div>
+          <!-- NF CALIBRATION OVERLAY -->
+          <div id="calib-nf-box" style="display:none;position:absolute;inset:0;z-index:99;cursor:crosshair;" onclick="calibNFClick(event)"></div>
+          <div id="calib-nf-info" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;font-family:monospace;font-size:13px;padding:10px 18px;border-radius:8px;z-index:9999;white-space:pre;pointer-events:none;"></div>
+        </div>
+        <div class="tut-nf-caption" id="tut-nf-caption"></div>
+      </div>
+
+      <!-- COL 3: Description -->
+      <div class="tut-col-desc">
+        <div class="tut-desc-field-name" id="tut-desc-name"></div>
+        <div class="tut-desc-text" id="tut-desc-text"></div>
+        <div class="tut-desc-note" id="tut-desc-note" style="display:none"></div>
+      </div>
+
+    </div><!-- /tutorial-body -->
+
+    <!-- FOOTER -->
+    <div class="tutorial-footer">
+      <div class="tut-dots" id="tut-dots"></div>
+      <div class="tut-nav">
+        <button class="tut-btn-back" id="tut-btn-back" onclick="tutNav(-1)">Anterior</button>
+        <button class="tut-btn-next" id="tut-btn-next" onclick="tutNav(1)">Próximo</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════ -->
+<script src="script.js"></script>
+
+</body>
+</html>
