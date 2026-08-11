@@ -1,0 +1,2999 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuração eNotas — Hotmart</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #222222;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    /* ─── CARD ─────────────────────────────────────────── */
+    .card {
+      background: #ffffff;
+      border-radius: 24px;
+      width: 100%;
+      max-width: 840px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.45);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ─── STEP TRANSITION OVERLAY ────────────────────────── */
+    #step-overlay {
+      position: absolute;
+      inset: 0;
+      background: #ffffff;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 200;
+    }
+    #step-overlay.fading {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* ─── HEADER ───────────────────────────────────────── */
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 28px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .logo-cabecalho { height: 38px; object-fit: contain; }
+
+    /* ─── STEPPER ──────────────────────────────────────── */
+    .stepper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      padding: 16px 24px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .step-item {
+      display: flex;
+      align-items: center;
+    }
+    .step-circle-wrap {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .step-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s;
+      user-select: none;
+    }
+    .step-circle:hover { transform: scale(1.08); }
+    .step-circle.active   { background: #111111; color: #ffffff; }
+    .step-circle.done     { background: #111111; color: #ffffff; }
+    .step-circle.inactive { background: #f0f0f0; color: #aaaaaa; }
+
+    .step-tooltip {
+      position: absolute;
+      bottom: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #111111;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 6px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.18s;
+      z-index: 10;
+    }
+    .step-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: #111111;
+    }
+    .step-circle-wrap:hover .step-tooltip { opacity: 1; }
+
+    .step-line {
+      width: 72px;
+      height: 2px;
+      background: #e8e8e8;
+      margin: 0 4px;
+      transition: background 0.3s;
+    }
+    .step-line.done { background: #111111; }
+
+    /* ─── BODY ─────────────────────────────────────────── */
+    .card-body {
+      display: flex;
+      min-height: 400px;
+    }
+
+    .content-panel {
+      flex: 1;
+      padding: 24px 32px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .sidebar {
+      width: 270px;
+      background: #f8f8f8;
+      border-left: 1px solid #f0f0f0;
+      padding: 28px 20px;
+      flex-shrink: 0;
+    }
+
+    /* ─── STEP PAGE ────────────────────────────────────── */
+    .step-page { display: none; }
+    .step-page.active { display: block; }
+
+    .step-label {
+      font-size: 14px;
+      font-weight: 400;
+      color: #888888;
+      letter-spacing: 2px;
+      line-height: 20px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .step-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 30px;
+      font-weight: 700;
+      color: #111111;
+      line-height: 36px;
+      margin-bottom: 16px;
+    }
+    .step-subtitle {
+      font-size: 16px;
+      font-weight: 400;
+      color: #111111;
+      line-height: 24px;
+      margin-bottom: 24px;
+    }
+
+    /* ─── INLINE LINK ──────────────────────────────────── */
+    .link-modal {
+      color: #111111;
+      font-weight: 600;
+      text-decoration: underline;
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: inherit;
+      font-size: inherit;
+      padding: 0;
+      display: inline;
+    }
+    .link-modal:hover { opacity: 0.65; }
+
+    /* ─── INFO LIST ─────────────────────────────────────── */
+    .info-list {
+      list-style: none;
+      margin: 4px 0 16px 0;
+    }
+    .info-list li {
+      position: relative;
+      padding-left: 16px;
+      font-size: 16px;
+      font-weight: 400;
+      color: #111111;
+      line-height: 24px;
+      margin-bottom: 12px;
+    }
+    .info-list li::before {
+      content: '–';
+      position: absolute;
+      left: 0;
+      color: #aaaaaa;
+    }
+    .info-list li.small {
+      font-size: 12.5px;
+      color: #777777;
+    }
+    .info-list li a { color: #111111; font-weight: 600; }
+
+    /* ─── CONTENT MEDIA ─────────────────────────────────── */
+    .content-img {
+      width: 100%;
+      max-width: 420px;
+      border-radius: 8px;
+      border: 1px solid #eeeeee;
+      margin: 0;
+      display: block;
+    }
+
+    /* image wrapper with zoom button */
+    .img-wrap {
+      position: relative;
+      display: inline-block;
+      margin: 16px 0 8px 0;
+      max-width: 420px;
+      width: 100%;
+    }
+    .img-wrap-half {
+      position: relative;
+      display: block;
+      width: calc(50% - 5px);
+      flex-shrink: 0;
+    }
+    .img-zoom-btn {
+      position: absolute;
+      top: 7px;
+      right: 7px;
+      width: 26px;
+      height: 26px;
+      background: rgba(255,255,255,0.92);
+      border: 1px solid #dddddd;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+      z-index: 5;
+      padding: 0;
+    }
+    .img-zoom-btn:hover { background: #ffffff; border-color: #aaaaaa; }
+    .img-zoom-btn svg { width: 14px; height: 14px; }
+
+    /* lightbox */
+    .lightbox-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s;
+      padding: 20px;
+    }
+    .lightbox-overlay.open { opacity: 1; pointer-events: all; }
+    .lightbox-inner {
+      position: relative;
+      max-width: 90vw;
+      max-height: 88vh;
+    }
+    .lightbox-inner img {
+      max-width: 90vw;
+      max-height: 88vh;
+      border-radius: 10px;
+      display: block;
+      transform: translateY(10px);
+      transition: transform 0.22s;
+    }
+    .lightbox-overlay.open .lightbox-inner img { transform: translateY(0); }
+    .lightbox-close {
+      position: absolute;
+      top: -14px;
+      right: -14px;
+      width: 30px;
+      height: 30px;
+      background: #ffffff;
+      border: none;
+      border-radius: 50%;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #111111;
+      line-height: 1;
+    }
+    .lightbox-close:hover { background: #eeeeee; }
+
+    /* ─── SIDEBAR STEPS ─────────────────────────────────── */
+    .sidebar-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #bbbbbb;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    .sb-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #ebebeb;
+    }
+    .sb-step:last-child { border-bottom: none; }
+    .sb-step-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      width: 100%;
+    }
+
+    .sb-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 1.5px solid #cccccc;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
+    .sb-icon.active { background: #111111; border-color: #111111; }
+    .sb-icon.done   { background: #111111; border-color: #111111; }
+
+    .sb-icon svg { width: 12px; height: 12px; }
+
+    .sb-text {
+      font-size: 13px;
+      color: #bbbbbb;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+    .sb-text.active { color: #111111; font-weight: 600; }
+    .sb-text.done   { color: #111111; }
+
+    .sb-img {
+      width: 110px;
+      height: 110px;
+      border-radius: 16px;
+      margin-top: 12px;
+      align-self: center;
+      display: none;
+      object-fit: cover;
+      object-position: center;
+    }
+    .sb-img.visible { display: block; }
+
+    /* ─── ACCORDION ─────────────────────────────────────── */
+    .accordion {
+      border: 1px solid #c3bfb8;
+      border-radius: 12px;
+      cursor: pointer;
+      user-select: none;
+      transition: border-color 0.2s;
+      margin-bottom: 0;
+      background: #ffffff;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+    .accordion:hover { border-color: #7a7773; }
+    .accordion.open  { border-color: #111111; }
+
+    .accordion-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+    }
+    .accordion-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #111111;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .acc-badge {
+      font-size: 12px;
+      font-weight: 400;
+      background: #111111;
+      color: #ffffff;
+      border: 1px solid #c3bfb8;
+      padding: 2px 8px;
+      border-radius: 9999px;
+    }
+    .acc-arrow {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      transition: transform 0.25s;
+    }
+    .accordion.open .acc-arrow { transform: rotate(180deg); }
+
+    .accordion-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.25s;
+      padding: 0 24px;
+      border-top: 0px solid #dcdad6;
+    }
+    .accordion-body.open {
+      max-height: 1200px;
+      padding: 16px 24px 24px;
+      border-top: 1px solid #dcdad6;
+    }
+    .acc-intro {
+      font-size: 14px;
+      color: #444444;
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+
+    /* inline (i) popup trigger */
+    .tip-trigger {
+      display: inline-flex;
+      align-items: center;
+      vertical-align: middle;
+      margin-left: 4px;
+      cursor: pointer;
+    }
+    .tooltip-icon {
+      background: #cccccc;
+      color: #555555;
+      font-size: 10px;
+      font-weight: 700;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .tip-trigger:hover .tooltip-icon { background: #aaaaaa; }
+
+    /* small tip popup — centered overlay */
+    .tip-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .tip-overlay.open { opacity: 1; pointer-events: all; }
+    .tip-popup {
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      padding: 12px 14px;
+      width: 220px;
+      transform: translateY(8px);
+      transition: transform 0.2s;
+    }
+    .tip-overlay.open .tip-popup { transform: translateY(0); }
+    .tip-popup-inner {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .tip-popup-text {
+      font-size: 12px;
+      color: #444444;
+      line-height: 1.5;
+      flex: 1;
+    }
+    .tip-popup-close {
+      background: #f4f4f4;
+      border: none;
+      font-size: 16px;
+      color: #666666;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0;
+      flex-shrink: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: -2px;
+      transition: background 0.15s;
+    }
+    .tip-popup-close:hover { background: #e0e0e0; color: #111111; }
+
+    /* side-by-side images */
+    .img-row {
+      display: flex;
+      gap: 10px;
+      margin: 16px 0 8px 0;
+    }
+    .content-img-half {
+      width: 100%;
+      height: 160px;
+      border-radius: 8px;
+      border: 1px solid #eeeeee;
+      object-fit: cover;
+      object-position: top;
+      display: block;
+    }
+
+    /* step note (indented text, no dash) */
+    .step-note {
+      font-size: 12.5px;
+      color: #777777;
+      line-height: 1.7;
+      padding-left: 16px;
+      margin: -4px 0 12px 0;
+    }
+    .step-note .link-modal {
+      font-size: 12.5px;
+      color: #111111;
+    }
+
+    /* ─── TUTORIAL MODAL ────────────────────────────────── */
+    .tutorial-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s;
+      padding: 16px;
+    }
+    .tutorial-overlay.open { opacity: 1; pointer-events: all; }
+
+    .tutorial-box {
+      background: #ffffff;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 1000px;
+      height: 86vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform: translateY(10px);
+      transition: transform 0.22s, max-width 0.3s, height 0.3s, border-radius 0.3s;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+    }
+    .tutorial-overlay.open .tutorial-box { transform: translateY(0); }
+
+    .tutorial-box.fullscreen {
+      max-width: 100vw;
+      width: 100vw;
+      height: 100vh;
+      border-radius: 0;
+    }
+    .tutorial-overlay.fullscreen-mode {
+      padding: 0;
+    }
+    .tut-btn-fullscreen {
+      background: #f4f4f4;
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s;
+      margin-right: 4px;
+    }
+    .tut-btn-fullscreen:hover { background: #e0e0e0; }
+    .tut-btn-fullscreen svg { width: 14px; height: 14px; }
+
+    /* HEADER */
+    .tutorial-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      border-bottom: 1px solid #f0f0f0;
+      flex-shrink: 0;
+    }
+    .tutorial-header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .tutorial-badge {
+      background: #111111;
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 99px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .tutorial-step-label {
+      font-size: 12px;
+      color: #888888;
+      white-space: nowrap;
+    }
+    .tutorial-header-title {
+      flex: 1;
+      font-size: 15px;
+      font-weight: 700;
+      color: #111111;
+      text-align: center;
+    }
+    .tutorial-close {
+      background: #f4f4f4;
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 18px;
+      cursor: pointer;
+      color: #666;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .tutorial-close:hover { background: #e0e0e0; color: #111; }
+
+    /* BODY: 3 columns */
+    .tutorial-body {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    /* COL 1: eNotas PDF form */
+    .tut-col-form {
+      width: 300px;
+      flex-shrink: 0;
+      border-right: 1px solid #f0f0f0;
+      overflow: hidden;
+      position: relative;
+      background: #fafafa;
+    }
+    .tutorial-box.fullscreen .tut-col-form { width: 380px; }
+    .tut-form-wrap {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    .tut-form-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      transition: top 0.4s ease, left 0.4s ease, width 0.4s ease;
+    }
+    .tut-form-highlight {
+      position: absolute;
+      border: 2.5px solid #c8b89a;
+      border-radius: 3px;
+      background: rgba(245,243,239,0.5);
+      pointer-events: none;
+      transition: all 0.4s ease;
+      z-index: 2;
+    }
+
+    /* COL 2: Nota Fiscal zoomed */
+    .tut-col-nf {
+      flex: 1;
+      border-right: 1px solid #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .tut-nf-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 10px 12px 6px;
+      flex-shrink: 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .tut-nf-zoom-wrap {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+      background: #f5f5f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .tut-nf-zoom-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+      transform-origin: center center;
+      transition: transform 0.4s ease;
+    }
+    .tut-nf-hl {
+      position: absolute;
+      border: 2.5px solid #c8b89a;
+      border-radius: 3px;
+      background: rgba(245,243,239,0.5);
+      pointer-events: none;
+      transition: all 0.4s ease;
+      z-index: 2;
+    }
+    .tut-nf-caption {
+      padding: 7px 12px;
+      font-size: 11px;
+      color: #666;
+      background: #f0eeeb;
+      border-top: 1px solid #e0e0e0;
+      text-align: center;
+      flex-shrink: 0;
+      line-height: 1.4;
+    }
+
+    /* COL 3: Description text */
+    .tut-col-desc {
+      width: 260px;
+      flex-shrink: 0;
+      padding: 18px 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .tutorial-box.fullscreen .tut-col-desc { width: 340px; }
+    .tut-desc-field-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: #111;
+      margin-bottom: 2px;
+    }
+    .tut-desc-text {
+      font-size: 13px;
+      color: #333;
+      line-height: 1.7;
+    }
+    .tut-desc-note {
+      background: #f5f3ef;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12.5px;
+      color: #555;
+      line-height: 1.6;
+    }
+    .tut-desc-note a { color: #111; font-weight: 600; }
+
+    /* FOOTER */
+    .tutorial-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      border-top: 1px solid #f0f0f0;
+      flex-shrink: 0;
+    }
+    .tut-dots { display: flex; gap: 6px; align-items: center; }
+    .tut-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #e0e0e0;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .tut-dot.active { background: #111111; transform: scale(1.25); }
+    .tut-nav { display: flex; gap: 8px; }
+    .tut-btn-back, .tut-btn-next {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .tut-btn-back {
+      background: transparent;
+      border: 1.5px solid #dddddd;
+      color: #555555;
+    }
+    .tut-btn-back:hover { border-color: #999; color: #111; }
+    .tut-btn-next { background: #111111; border: none; color: #fff; }
+    .tut-btn-next:hover { background: #333333; }
+    .card-footer {
+      border-top: 1px solid #f0f0f0;
+      padding: 16px 28px;
+    }
+    .progress-track {
+      height: 3px;
+      background: #f0f0f0;
+      border-radius: 99px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #111111;
+      border-radius: 99px;
+      transition: width 0.4s ease;
+    }
+    .footer-buttons {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .btn-back {
+      background: transparent;
+      border: 1.5px solid #dddddd;
+      color: #555555;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 26px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-back:hover { border-color: #999; color: #111111; }
+
+    .btn-next {
+      background: #111111;
+      border: none;
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 30px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-next:hover { background: #333333; }
+
+    /* ─── MODAL ─────────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s;
+      padding: 20px;
+    }
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .modal-box {
+      background: #ffffff;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 580px;
+      max-height: 82vh;
+      display: flex;
+      flex-direction: column;
+      transform: translateY(12px);
+      transition: transform 0.22s;
+      overflow: hidden;
+    }
+    .modal-overlay.open .modal-box { transform: translateY(0); }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid #f0f0f0;
+      flex-shrink: 0;
+    }
+    .modal-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #111111;
+    }
+    .modal-close {
+      background: #f4f4f4;
+      border: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+      color: #666666;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.18s;
+    }
+    .modal-close:hover { background: #e8e8e8; color: #111111; }
+
+    .modal-body {
+      padding: 20px 24px;
+      overflow-y: auto;
+    }
+    .modal-body p {
+      font-size: 14px;
+      color: #555555;
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+    .modal-steps {
+      list-style: none;
+      counter-reset: mc;
+      margin-top: 4px;
+    }
+    .modal-steps li {
+      counter-increment: mc;
+      display: flex;
+      gap: 12px;
+      margin-bottom: 14px;
+      font-size: 14px;
+      color: #444444;
+      line-height: 1.6;
+      word-spacing: -0.01em;
+    }
+    .modal-steps li::before {
+      content: counter(mc);
+      background: #111111;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      min-width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .modal-steps a { color: #111111; font-weight: 600; }
+    .modal-steps strong { font-weight: 700; display: inline; }
+
+    .modal-footer-btn {
+      display: flex;
+      justify-content: flex-end;
+      padding: 16px 24px;
+      border-top: 1px solid #f0f0f0;
+      flex-shrink: 0;
+    }
+    .modal-footer-btn button {
+      background: #111111;
+      border: none;
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 10px 26px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .modal-footer-btn button:hover { background: #333333; }
+
+    /* ─── ARTICLE CARDS (step 6) ────────────────────────── */
+    .articles-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 20px 0 24px;
+    }
+    .article-card {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      border: 1px solid #e8e8e8;
+      border-radius: 12px;
+      text-decoration: none;
+      background: #ffffff;
+      transition: border-color 0.18s, background 0.18s;
+      cursor: pointer;
+    }
+    .article-card:hover { border-color: #aaaaaa; background: #fafafa; }
+    .article-card-soon { cursor: default; opacity: 0.6; }
+    .article-card-soon:hover { border-color: #e8e8e8; background: #ffffff; }
+    .article-card-icon {
+      width: 36px; height: 36px;
+      background: #f5f3ef;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .article-card-icon svg { width: 18px; height: 18px; color: #555555; }
+    .article-card-body { flex: 1; min-width: 0; }
+    .article-card-title {
+      font-size: 13.5px; font-weight: 600; color: #111111;
+      margin-bottom: 2px;
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .article-card-sub { font-size: 12px; color: #888888; line-height: 1.4; }
+    .article-card-arrow { width: 16px; height: 16px; flex-shrink: 0; color: #aaaaaa; }
+    .article-card:hover .article-card-arrow { color: #111111; }
+    .article-soon-badge {
+      font-size: 10px; font-weight: 600;
+      background: #f0eeeb; color: #888888;
+      padding: 2px 7px; border-radius: 99px; letter-spacing: 0.03em;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       WELCOME SCREEN
+       ════════════════════════════════════════════════════ */
+    #screen-welcome {
+      position: fixed;
+      inset: 0;
+      background: #222222;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 9999;
+      transition: opacity 0.4s ease;
+    }
+    #screen-welcome.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .welcome-card {
+      background: #ffffff;
+      border-radius: 24px;
+      width: 100%;
+      max-width: 720px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.45);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .welcome-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 28px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .welcome-btn-help {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: #111111;
+      border: 1.5px solid #dddddd;
+      border-radius: 99px;
+      padding: 7px 16px;
+      background: transparent;
+      cursor: pointer;
+      text-decoration: none;
+      text-transform: uppercase;
+      transition: border-color 0.2s, background 0.2s, color 0.2s;
+    }
+    .welcome-btn-help:hover {
+      background: #111111;
+      border-color: #111111;
+      color: #ffffff;
+    }
+    .welcome-body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 48px 44px;
+      text-align: center;
+    }
+    .welcome-eyebrow {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: #888888;
+      margin-bottom: 18px;
+    }
+    .welcome-title-img {
+      max-width: 320px;
+      margin: 0 auto 22px;
+      display: block;
+    }
+    .welcome-subtitle {
+      font-size: 16px;
+      color: #555555;
+      line-height: 1.7;
+      max-width: 420px;
+      margin: 0 auto 36px;
+    }
+    .auto-anim {
+      position: relative;
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      vertical-align: -4px;
+      margin-left: 4px;
+    }
+    .auto-anim svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 20px;
+      height: 20px;
+    }
+    .auto-anim-paper {
+      color: #555555;
+      transform-origin: center;
+      animation: auto-anim-paper 3.2s ease-in-out infinite;
+    }
+    .auto-anim-rocket {
+      color: #FF6900;
+      transform-origin: center;
+      animation: auto-anim-rocket 3.2s ease-in-out infinite;
+    }
+    @keyframes auto-anim-paper {
+      0%, 28%   { transform: scale(1) rotate(0deg); opacity: 1; }
+      34%       { transform: scale(0.88, 1.06) rotate(-7deg); opacity: 1; }
+      38%       { transform: scale(1.05, 0.82) rotate(9deg); opacity: 1; }
+      42%       { transform: scale(0.78, 0.78) rotate(-11deg); opacity: 1; }
+      46%       { transform: scale(0.45, 0.45) rotate(16deg); opacity: 0.4; }
+      50%, 100% { transform: scale(0.25, 0.25) rotate(20deg); opacity: 0; }
+    }
+    @keyframes auto-anim-rocket {
+      0%, 47%   { transform: translate(0, 0) rotate(45deg) scale(0.5); opacity: 0; }
+      52%       { transform: translate(1px, -1px) rotate(45deg) scale(0.85); opacity: 1; }
+      80%       { transform: translate(16px, -20px) rotate(45deg) scale(1); opacity: 1; }
+      96%       { transform: translate(24px, -30px) rotate(45deg) scale(1.05); opacity: 0; }
+      100%      { transform: translate(0, 0) rotate(45deg) scale(0.5); opacity: 0; }
+    }
+    .welcome-btn-start {
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      background: #111111;
+      color: #ffffff;
+      border: none;
+      padding: 14px 44px;
+      border-radius: 99px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .welcome-btn-start:hover { background: #333333; }
+    .welcome-footer {
+      padding: 16px 28px;
+      border-top: 1px solid #f0f0f0;
+      text-align: center;
+    }
+    .welcome-footer-text {
+      font-size: 12px;
+      color: #aaaaaa;
+    }
+    .welcome-footer-text a { color: #aaaaaa; text-decoration: underline; }
+
+    /* ═══════════════════════════════════════════════════════
+       TYPE SELECTION SCREEN (dentro do card)
+       ════════════════════════════════════════════════════ */
+    #screen-type {
+      display: none;
+      padding: 40px 40px 36px;
+    }
+    .card.mode-type #screen-type   { display: block; }
+    .card.mode-type .stepper       { display: none; }
+    .card.mode-type .card-body     { display: none; }
+    .card.mode-type .card-footer   { display: none; }
+
+    .type-inner {
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .type-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: #111111;
+      line-height: 1.2;
+      margin-bottom: 10px;
+      text-align: left;
+    }
+    .type-subtitle {
+      font-size: 14px;
+      color: #111111;
+      line-height: 1.7;
+      margin: 0 0 28px;
+      max-width: 540px;
+      text-align: left;
+    }
+    .type-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin: 0 auto 22px;
+      max-width: 480px;
+    }
+    .type-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      border: 1.5px solid #e8e8e8;
+      border-radius: 14px;
+      padding: 18px 20px;
+      cursor: pointer;
+      transition: border-color 0.18s, background 0.18s;
+      user-select: none;
+    }
+    .type-option:hover { border-color: #bbbbbb; }
+    .type-option.selected { border-color: #111111; background: #fafafa; }
+    .type-option-icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      background: #f5f3ef;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .type-option-icon svg { width: 19px; height: 19px; color: #111111; }
+    .type-option-body { flex: 1; min-width: 0; }
+    .type-option-title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+      flex-wrap: wrap;
+    }
+    .type-option-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #111111;
+    }
+    .type-badge {
+      background: #111111;
+      color: #ffffff;
+      font-size: 10.5px;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      padding: 3px 9px;
+      border-radius: 99px;
+    }
+    .type-option-desc { font-size: 13px; color: #888888; line-height: 1.5; }
+    .type-option-desc .type-option-example { color: #aaaaaa; font-size: 12px; margin-top: 3px; display: block; }
+    .type-option-simple { padding: 16px 20px; }
+    .type-option-simple .type-option-title { font-size: 14px; font-weight: 600; }
+    .type-radio {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      border: 1.5px solid #cccccc;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+      transition: border-color 0.15s;
+    }
+    .type-radio::after {
+      content: '';
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #111111;
+      transform: scale(0);
+      transition: transform 0.15s;
+    }
+    .type-option.selected .type-radio { border-color: #111111; }
+    .type-option.selected .type-radio::after { transform: scale(1); }
+
+    .type-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 4px 0 18px;
+    }
+    .type-divider::before,
+    .type-divider::after {
+      content: '';
+      flex: 1 1 auto;
+      height: 1px;
+      background: #e3e3e3;
+    }
+    .type-divider span {
+      flex: 0 0 auto;
+      font-size: 12.5px;
+      color: #999999;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      white-space: nowrap;
+    }
+    .type-divider-info {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: help;
+    }
+    .type-divider-info svg { display: block; }
+    .type-divider-info::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: calc(100% + 9px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      background: #111111;
+      color: #ffffff;
+      font-style: normal;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.4;
+      white-space: nowrap;
+      padding: 8px 12px;
+      border-radius: 8px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s, transform 0.15s;
+      z-index: 5;
+    }
+    .type-divider-info::before {
+      content: '';
+      position: absolute;
+      bottom: calc(100% + 3px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      border: 5px solid transparent;
+      border-top-color: #111111;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s, transform 0.15s;
+      z-index: 5;
+    }
+    .type-divider-info:hover::after,
+    .type-divider-info:hover::before {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .type-error {
+      font-size: 13px;
+      color: #cc4444;
+      margin-bottom: 14px;
+      display: none;
+      min-height: 18px;
+    }
+    .type-btn-continue {
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      background: #111111;
+      color: #ffffff;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .type-btn-continue:hover { background: #333333; }
+
+    /* ═══════════════════════════════════════════════════════
+       PRODUCT PLACEHOLDER SCREEN (dentro do card)
+       ════════════════════════════════════════════════════ */
+    #screen-product {
+      display: none;
+      padding: 60px 40px 44px;
+      text-align: center;
+    }
+    .card.mode-product #screen-product { display: flex; flex-direction: column; align-items: center; }
+    .card.mode-product .stepper        { display: none; }
+    .card.mode-product .card-body      { display: none; }
+    .card.mode-product .card-footer    { display: none; }
+
+    .product-ph-icon {
+      width: 56px; height: 56px;
+      background: #f5f3ef;
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 24px;
+    }
+    .product-ph-icon svg { width: 28px; height: 28px; color: #888888; }
+    .product-ph-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: #111111;
+      margin-bottom: 12px;
+    }
+    .product-ph-text {
+      font-size: 15px;
+      color: #666666;
+      line-height: 1.7;
+      max-width: 400px;
+      margin: 0 auto 32px;
+    }
+    .product-ph-btn {
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      background: #111111;
+      color: #ffffff;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .product-ph-btn:hover { background: #333333; }
+
+    /* Banner no step 5 para modo "ambos" */
+    #step5-product-banner {
+      display: none;
+      margin-top: 24px;
+      background: #f5f3ef;
+      border: 1px solid #dcdad6;
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+    #step5-product-banner.visible { display: block; }
+    .banner-title { font-size: 15px; font-weight: 700; color: #111111; margin-bottom: 6px; }
+    .banner-text  { font-size: 13px; color: #555555; line-height: 1.6; margin-bottom: 14px; }
+    .banner-btn   {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      background: #111111;
+      color: #ffffff;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .banner-btn:hover { background: #333333; }
+
+    /* ═══════════════════════════════════════════════════════
+       RESPONSIVE
+       ════════════════════════════════════════════════════ */
+
+    /* ── TABLET (≤ 768px) ─────────────────────────────────── */
+    @media (max-width: 768px) {
+      #screen-welcome { padding: 0; }
+      .welcome-card { border-radius: 0; max-width: 100%; min-height: 100vh; justify-content: space-between; }
+      .welcome-body { padding: 48px 28px 36px; }
+      .welcome-title-img { max-width: 260px; }
+      #screen-type { padding: 28px 24px 28px; }
+      .type-cards { flex-direction: column; }
+      body { padding: 0; align-items: flex-start; background: #ffffff; }
+
+      .card {
+        max-width: 100%;
+        border-radius: 0;
+        box-shadow: none;
+        min-height: 100vh;
+      }
+
+      .card-header { padding: 14px 20px; }
+      .logo-cabecalho { height: 32px; }
+
+      /* Stepper: linhas menores */
+      .stepper { padding: 12px 16px; }
+      .step-line { width: 40px; }
+      .step-circle { width: 32px; height: 32px; font-size: 12px; }
+
+      /* Body: sidebar vai para baixo do conteúdo */
+      .card-body { flex-direction: column; }
+
+      .content-panel { padding: 20px 20px; }
+
+      .sidebar {
+        width: 100%;
+        border-left: none;
+        border-top: 1px solid #f0f0f0;
+        padding: 20px 20px;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: flex-start;
+      }
+
+      .sidebar-label { width: 100%; margin-bottom: 4px; }
+
+      .sb-step {
+        flex-direction: row;
+        align-items: center;
+        border-bottom: none;
+        border-right: 1px solid #ebebeb;
+        padding: 6px 12px 6px 0;
+        gap: 8px;
+        flex: 1 1 auto;
+        min-width: 140px;
+      }
+      .sb-step:last-child { border-right: none; }
+      .sb-step-row { width: auto; }
+      .sb-img { display: none !important; }
+
+      .step-title { font-size: 24px; line-height: 30px; }
+      .step-subtitle { font-size: 15px; }
+
+      /* Footer */
+      .card-footer { padding: 14px 20px; }
+
+      /* Tutorial: 2 colunas (form oculto, NF + desc empilhados) */
+      .tutorial-overlay { padding: 0; align-items: flex-end; }
+      .tutorial-box {
+        max-width: 100vw;
+        width: 100vw;
+        height: 92vh;
+        border-radius: 20px 20px 0 0;
+      }
+      .tut-col-form { display: none; }
+      .tutorial-body { flex-direction: column; }
+      .tut-col-nf {
+        flex: 1;
+        border-right: none;
+        border-bottom: 1px solid #f0f0f0;
+        min-height: 0;
+      }
+      .tut-col-desc {
+        width: 100%;
+        flex-shrink: 0;
+        max-height: 38%;
+        overflow-y: auto;
+        padding: 14px 16px;
+        gap: 10px;
+      }
+      .tutorial-box.fullscreen .tut-col-form { display: none; }
+      .tutorial-box.fullscreen .tut-col-desc { width: 100%; }
+
+      /* Imagens lado a lado: empilha em coluna */
+      .img-row { flex-direction: column; }
+      .img-wrap-half { width: 100%; }
+      .content-img-half { height: 200px; }
+    }
+
+    /* ── MOBILE (≤ 480px) ─────────────────────────────────── */
+    @media (max-width: 480px) {
+      .welcome-body { padding: 40px 20px 28px; }
+      .welcome-title-img { max-width: 220px; }
+      .welcome-subtitle { font-size: 14px; }
+      #screen-type { padding: 24px 20px; }
+      .type-title { font-size: 22px; }
+      .card-header { padding: 12px 16px; }
+      .logo-cabecalho { height: 28px; }
+      .welcome-btn-help { padding: 6px 10px; font-size: 12px; }
+      .welcome-btn-help svg { display: none; }
+
+      /* Stepper: esconde labels do tooltip, linhas menores */
+      .stepper { padding: 10px 8px; gap: 0; }
+      .step-line { width: 22px; margin: 0 2px; }
+      .step-circle { width: 28px; height: 28px; font-size: 11px; }
+
+      .content-panel { padding: 16px 16px; }
+
+      .step-label { font-size: 12px; letter-spacing: 1.5px; }
+      .step-title { font-size: 21px; line-height: 27px; }
+      .step-subtitle { font-size: 14px; line-height: 22px; }
+
+      .info-list li { font-size: 14px; }
+
+      /* Sidebar em mobile: lista compacta horizontal com scroll */
+      .sidebar {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        padding: 12px 16px;
+        gap: 0;
+        -webkit-overflow-scrolling: touch;
+      }
+      .sb-step {
+        flex-shrink: 0;
+        padding: 6px 14px 6px 0;
+        min-width: auto;
+      }
+      .sb-text { font-size: 12px; }
+
+      /* Footer */
+      .card-footer { padding: 12px 16px; }
+      .btn-back, .btn-next { font-size: 13px; padding: 9px 20px; }
+
+      /* Accordion */
+      .accordion-header { padding: 14px 16px; }
+      .accordion-title { font-size: 15px; }
+      .accordion-body.open { padding: 14px 16px 18px; }
+
+      /* Tutorial mobile */
+      .tutorial-overlay { padding: 0; }
+      .tutorial-box { height: 95vh; border-radius: 16px 16px 0 0; }
+      .tutorial-header { padding: 12px 14px; }
+      .tutorial-header-title { font-size: 13px; }
+      .tut-btn-fullscreen { display: none; }
+
+      .tut-col-desc {
+        max-height: 42%;
+        padding: 12px 14px;
+        gap: 8px;
+      }
+      .tut-desc-field-name { font-size: 13px; }
+      .tut-desc-text { font-size: 12.5px; }
+      .tut-desc-note { font-size: 12px; padding: 8px 10px; }
+
+      .tutorial-footer { padding: 8px 14px; }
+      .tut-btn-back, .tut-btn-next { font-size: 12px; padding: 7px 14px; }
+
+      /* Modal */
+      .modal-overlay { padding: 12px; align-items: flex-end; }
+      .modal-box {
+        max-height: 88vh;
+        border-radius: 14px 14px 14px 14px;
+      }
+
+      /* Lightbox */
+      .lightbox-inner img { max-width: 96vw; max-height: 80vh; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  WELCOME SCREEN                                        -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div id="screen-welcome">
+  <div class="welcome-card">
+    <div class="welcome-header">
+      <img src="Logo-Cabecalho.png" alt="eNotas | Hotmart" class="logo-cabecalho">
+      <a href="https://atendimento.enotas.com.br/hc/pt-br/requests/new?ticket_form_id=43180182029581&tf_subject=Ajuda%20Onboarding%20Automatizado&tf_42671641667853=cr_enotas_config_dentro-30-dias&tf_description=Assinale%20qual%20problema%20voc%C3%AA%20est%C3%A1%20enfrentando%3A%3Cbr%3E%3Cbr%3E()%20Configura%C3%A7%C3%A3o%20da%20nota%20fiscal%3Cbr%3E()%20Emiss%C3%A3o%20nota%20teste%3Cbr%3E()%20Integrar%20nova%20plataforma%20de%20vendas%3Cbr%3E()%20Importar%20vendas%20antigas%3Cbr%3E()%20Outro%3A%20Descreva%3Cbr%3E%3Cbr%3ESe%20poss%C3%ADvel%2C%20detalhe%20o%20problema%20enfrentado%2C%20para%20podermos%20lhe%20atender%20da%20maneira%20mais%20assertiva%20poss%C3%ADvel." class="welcome-btn-help" target="_blank">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Ajuda
+      </a>
+    </div>
+    <div class="welcome-body">
+      <p class="welcome-eyebrow">Onboarding · Automatizado</p>
+      <img src="Logo-Titulo.png" alt="Guia de Onboarding eNotas" class="welcome-title-img">
+      <p class="welcome-subtitle">Siga as etapas para configurar a sua conta e dar início às emissões automáticas.<span class="auto-anim">
+          <svg class="auto-anim-paper" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+          <svg class="auto-anim-rocket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg>
+        </span></p>
+      <button class="welcome-btn-start" onclick="startFlow()">Iniciar</button>
+    </div>
+    <div class="welcome-footer">
+      <span class="welcome-footer-text">© 2026 eNotas — Todos os direitos reservados. | <a href="https://enotas.com.br/termos-de-uso/" target="_blank">Termos e condições de uso</a></span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  CARD                                                  -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="card">
+
+  <!-- TRANSITION OVERLAY -->
+  <div id="step-overlay"></div>
+
+  <!-- HEADER -->
+  <div class="card-header">
+    <img src="Logo-Cabecalho.png" alt="eNotas | Hotmart" class="logo-cabecalho">
+    <a href="https://atendimento.enotas.com.br/hc/pt-br/requests/new?ticket_form_id=43180182029581&tf_subject=Ajuda%20Onboarding%20Automatizado&tf_42671641667853=cr_enotas_config_dentro-30-dias&tf_description=Assinale%20qual%20problema%20voc%C3%AA%20est%C3%A1%20enfrentando%3A%3Cbr%3E%3Cbr%3E()%20Configura%C3%A7%C3%A3o%20da%20nota%20fiscal%3Cbr%3E()%20Emiss%C3%A3o%20nota%20teste%3Cbr%3E()%20Integrar%20nova%20plataforma%20de%20vendas%3Cbr%3E()%20Importar%20vendas%20antigas%3Cbr%3E()%20Outro%3A%20Descreva%3Cbr%3E%3Cbr%3ESe%20poss%C3%ADvel%2C%20detalhe%20o%20problema%20enfrentado%2C%20para%20podermos%20lhe%20atender%20da%20maneira%20mais%20assertiva%20poss%C3%ADvel." class="welcome-btn-help" target="_blank">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Ajuda
+    </a>
+  </div>
+
+  <!-- TYPE SELECTION -->
+  <div id="screen-type">
+    <div class="type-inner">
+      <h1 class="type-title">Qual tipo de nota você vai emitir?</h1>
+      <p class="type-subtitle">Escolha o tipo de nota fiscal que melhor se adequa ao seu negócio para continuarmos com a configuração.</p>
+      <div class="type-cards">
+
+        <div class="type-option" id="type-servico" onclick="selectType('servico')">
+          <div class="type-option-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+          <div class="type-option-body">
+            <div class="type-option-title-row">
+              <span class="type-option-title">NFS-e (Serviço)</span>
+              <span class="type-badge">Automatizado</span>
+            </div>
+            <div class="type-option-desc"><span style="color:#111111;">Preenchimento automático por envio de nota já emitida.</span><br><span class="type-option-example">Ex.: Cursos, Mentorias, Vídeo Aulas</span></div>
+          </div>
+          <div class="type-radio"></div>
+        </div>
+
+        <div class="type-divider"><span>Deseja emitir NF-e (Produto) ou Split? <span class="type-divider-info" data-tooltip="NFS-e + NF-e emitidas na mesma venda (Split)."><svg width="13" height="13" viewBox="0 0 26 26"><circle cx="13" cy="13" r="11" fill="none" stroke="#bbbbbb" stroke-width="2"/><text x="13" y="18" font-size="14" font-family="Inter, sans-serif" font-weight="700" fill="#999999" text-anchor="middle">?</text></svg></span></span></div>
+
+        <div class="type-option type-option-simple" id="type-outro" onclick="selectType('outro')">
+          <div class="type-option-body">
+            <span class="type-option-title">Configurar outro tipo de emissão</span>
+          </div>
+          <div class="type-radio"></div>
+        </div>
+
+      </div>
+      <p class="type-error" id="type-error">Selecione uma opção para continuar.</p>
+    </div>
+    <div style="text-align:right;">
+      <button class="type-btn-continue" onclick="confirmType()">Continuar</button>
+    </div>
+  </div>
+
+  <!-- PRODUCT PLACEHOLDER -->
+  <div id="screen-product">
+    <div class="product-ph-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+        <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+        <line x1="12" y1="22.08" x2="12" y2="12"/>
+      </svg>
+    </div>
+    <h2 class="product-ph-title">Configuração de NF-e (Produto)</h2>
+    <p class="product-ph-text">O guia de configuração para emissão de Nota Fiscal de Produto está sendo preparado e estará disponível em breve.</p>
+    <button class="product-ph-btn" onclick="finishGuide()">Concluir</button>
+  </div>
+
+  <!-- STEPPER -->
+  <div class="stepper">
+    <div class="step-item">
+      <div class="step-circle-wrap">
+        <div class="step-circle active" id="circle-1" onclick="navToStep(1)">1</div>
+        <div class="step-tooltip">Credenciamento portal de emissão</div>
+      </div>
+    </div>
+    <div class="step-line" id="line-1"></div>
+    <div class="step-item">
+      <div class="step-circle-wrap">
+        <div class="step-circle inactive" id="circle-2" onclick="navToStep(2)">2</div>
+        <div class="step-tooltip">Preenchimento dos dados fiscais</div>
+      </div>
+    </div>
+    <div class="step-line" id="line-2"></div>
+    <div class="step-item">
+      <div class="step-circle-wrap">
+        <div class="step-circle inactive" id="circle-3" onclick="navToStep(3)">3</div>
+        <div class="step-tooltip">Hora de conferir os dados</div>
+      </div>
+    </div>
+    <div class="step-line" id="line-3"></div>
+    <div class="step-item">
+      <div class="step-circle-wrap">
+        <div class="step-circle inactive" id="circle-4" onclick="navToStep(4)">4</div>
+        <div class="step-tooltip">Configure o envio das suas notas fiscais</div>
+      </div>
+    </div>
+    <div class="step-line" id="line-4"></div>
+    <div class="step-item">
+      <div class="step-circle-wrap">
+        <div class="step-circle inactive" id="circle-5" onclick="navToStep(5)">5</div>
+        <div class="step-tooltip">Emissão nota teste</div>
+      </div>
+    </div>
+    <div class="step-line" id="line-5"></div>
+    <div class="step-item">
+      <div class="step-circle-wrap">
+        <div class="step-circle inactive" id="circle-6" onclick="navToStep(6)">6</div>
+        <div class="step-tooltip">Configurações adicionais</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="card-body">
+
+    <!-- ── CONTENT PANEL ─────────────────────────────── -->
+    <div class="content-panel">
+
+      <!-- STEP 1 -->
+      <div class="step-page active" id="step-1">
+        <p class="step-label">Etapa 1 de 6</p>
+        <h1 class="step-title">Credenciamento portal de emissão NFS-e</h1>
+        <p class="step-subtitle">
+          Nesta etapa, vamos conectar o eNotas ao portal de emissão de NFS-e (Portal Nacional).
+        </p>
+        <p class="step-note" style="padding-left:0;margin-bottom:16px;">Caso ainda não tenha o seu CNPJ credenciado no portal, <button class="link-modal" onclick="openModal('modal-credenciamento')">clique aqui</button>.</p>
+
+        <ul class="info-list">
+          <li>
+            O credenciamento pode ser realizado de duas formas: via <strong>login e senha</strong>
+            de acesso ao Portal Nacional, ou via <strong>certificado digital A1</strong> do seu CNPJ.
+          </li>
+          <li>
+            Para garantir uma comunicação mais segura entre o eNotas e o Portal Nacional,
+            recomendamos o uso do <strong>certificado digital</strong>. <span class="tip-trigger" onclick="openTip2(event)"><span class="tooltip-icon">i</span></span>
+          </li>
+        </ul>
+
+        <div class="img-wrap">
+          <img src="img-1.jpg" alt="Opções de autenticação" class="content-img">
+          <button class="img-zoom-btn" onclick="openLightbox('img-1.jpg')"><svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step-page" id="step-2">
+        <p class="step-label">Etapa 2 de 6</p>
+        <h1 class="step-title">Preenchimento dos dados fiscais</h1>
+        <p class="step-subtitle">
+          Agora precisamos configurar os dados fiscais que serão utilizados na emissão
+          das suas notas fiscais pelo eNotas. Esses dados garantem que as notas sejam
+          emitidas corretamente para o seu tipo de serviço.
+        </p>
+
+        <!-- ACCORDION 1 -->
+        <div class="accordion" id="acc-1" onclick="toggleAcc(1)">
+          <div class="accordion-header">
+            <div class="accordion-title">Preenchimento automático <span class="acc-badge">Recomendado</span></div>
+            <svg class="acc-arrow" viewBox="0 0 12 12" fill="none">
+              <path d="M2 4L6 8L10 4" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="accordion-body" id="acc-body-1">
+          <p class="step-note" style="padding-left:0;margin-bottom:14px;">Não sabe como baixar o PDF ou XML de uma nota emitida no Portal Nacional? <button class="link-modal" onclick="openModal('modal-download-nf')">Veja o passo a passo aqui</button>.</p>
+          <ul class="info-list">
+            <li>Última nota emitida deste serviço com até 30 dias.</li>
+            <li>O documento deverá estar legível, importe o documento original. <span class="tip-trigger" onclick="openTip(event)"><span class="tooltip-icon">i</span></span></li>
+            <li>A nota fiscal deverá ter sido emitida pelo Portal Nacional (NFS-e).</li>
+            <li>Após importação do arquivo, será mostrado os campos preenchidos, valide as informações juntamente com a sua contabilidade.</li>
+          </ul>
+          <div class="img-row">
+            <div class="img-wrap-half">
+              <img src="img-3.jpg" alt="Importação automática" class="content-img-half">
+              <button class="img-zoom-btn" onclick="openLightbox('img-3.jpg')"><svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACCORDION 2 -->
+        <div class="accordion" id="acc-2" onclick="toggleAcc(2)" style="margin-top:24px;">
+          <div class="accordion-header">
+            <div class="accordion-title">Preenchimento manual</div>
+            <svg class="acc-arrow" viewBox="0 0 12 12" fill="none">
+              <path d="M2 4L6 8L10 4" stroke="#111111" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="accordion-body" id="acc-body-2">
+          <p class="acc-intro">Entenda cada campo da nota fiscal. <span class="tip-trigger" onclick="openTip3(event)"><span class="tooltip-icon">i</span></span></p>
+          <ul class="info-list">
+            <li>As informações dos dados fiscais deverão ser preenchidas manualmente.</li>
+            <li>Com as informações de uma nota já emitida e com o auxílio da sua contabilidade, siga com o preenchimento.</li>
+          </ul>
+          <div class="img-row">
+            <div class="img-wrap-half">
+              <img src="img-4.jpg" alt="Preenchimento manual" class="content-img-half">
+              <button class="img-zoom-btn" onclick="openLightbox('img-4.jpg')"><svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step-page" id="step-3">
+        <p class="step-label">Etapa 3 de 6</p>
+        <h1 class="step-title">Hora de conferir os dados</h1>
+        <p class="step-subtitle">
+          Com as informações já preenchidas no sistema de forma automática ou manual, revise as informações antes de continuar.
+        </p>
+        <ul class="info-list">
+          <li>Em caso de dúvidas referente aos campos preenchidos, consulte a sua contabilidade.</li>
+          <li>Se necessário, poderá realizar a alteração de qualquer informação que foi preenchida.</li>
+        </ul>
+        <div class="img-row">
+          <div class="img-wrap-half">
+            <img src="img-5.jpg" alt="Conferência dos dados" class="content-img-half">
+            <button class="img-zoom-btn" onclick="openLightbox('img-5.jpg')"><svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="step-page" id="step-4">
+        <p class="step-label">Etapa 4 de 6</p>
+        <h1 class="step-title">Configure o envio das suas notas fiscais</h1>
+        <p class="step-subtitle">
+          Nesta etapa, selecione como deseja que as vendas feitas na Hotmart, sejam emitidas pelo eNotas.
+        </p>
+        <ul class="info-list">
+          <li>Defina se deseja a <strong>emissão e envio da nota fiscal de forma automática</strong> após cada venda realizada.</li>
+          <li>Configure <strong>quando a nota fiscal deverá ser emitida e enviada</strong> para o seu cliente.</li>
+          <li>Assinale se deseja que os <strong>cancelamentos sejam realizados automaticamente</strong>, em caso de vendas canceladas pelo cliente.</li>
+        </ul>
+        <div class="img-wrap">
+          <img src="img-6.jpg" alt="Configuração de envio de notas" class="content-img" style="max-height:280px;object-fit:cover;object-position:top;">
+          <button class="img-zoom-btn" onclick="openLightbox('img-6.jpg')"><svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+        </div>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="step-page" id="step-5">
+        <p class="step-label">Etapa 5 de 6</p>
+        <h1 class="step-title">Emissão nota teste</h1>
+        <p class="step-subtitle">
+          Realizaremos a emissão de uma nota teste com os dados preenchidos, para validar se ficou tudo certinho!
+        </p>
+        <ul class="info-list">
+          <li>Você conseguirá visualizar a nota teste emitida pelo Portal Nacional ou pelo painel do eNotas.</li>
+          <li>Após a emissão, o envio de cancelamento da nota teste emitida, será feito automaticamente.</li>
+        </ul>
+        <div class="img-wrap">
+          <img src="img-7.jpg" alt="Emissão de nota teste" class="content-img">
+          <button class="img-zoom-btn" onclick="openLightbox('img-7.jpg')"><svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+        </div>
+
+        <!-- Banner de transição para NF-e Produto (aparece só no modo "ambos") -->
+        <div id="step5-product-banner" style="display:none"></div>
+
+      </div>
+
+      <!-- STEP 6 -->
+      <div class="step-page" id="step-6">
+        <p class="step-label">Etapa 6 de 6</p>
+        <h1 class="step-title">Configurações adicionais</h1>
+        <p class="step-subtitle">
+          Sua configuração principal está concluída! Se quiser explorar recursos extras ou precisar de ajuda com situações específicas, separamos alguns artigos que podem ser úteis.
+        </p>
+
+        <ul class="info-list">
+          <li>Os artigos abaixo cobrem cenários comuns que podem surgir no dia a dia da emissão.</li>
+          <li>Em caso de dúvidas, nossa equipe de suporte está disponível para ajudar.</li>
+        </ul>
+
+        <div class="articles-list">
+
+          <a class="article-card" href="https://atendimento.enotas.com.br/hc/pt-br/articles/35773344529421--Menu-Empresa-Ajustes-de-NFe-Como-configurar-os-tratamentos-de-erro-para-vendas-sem-documento-e-ou-sem-endere%C3%A7o-do-comprador" target="_blank">
+            <div class="article-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div class="article-card-body">
+              <div class="article-card-title">Como configurar tratamentos de erro</div>
+              <div class="article-card-sub">Como configurar os tratamentos de erro para vendas sem documento e/ou sem endereço do comprador</div>
+            </div>
+            <svg class="article-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+
+          <a class="article-card" href="https://atendimento.enotas.com.br/hc/pt-br/articles/35773756727565-Meu-plano-permite-importa%C3%A7%C3%A3o-de-vendas-antigas" target="_blank">
+            <div class="article-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 21 15 21"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+            </div>
+            <div class="article-card-body">
+              <div class="article-card-title">Importar vendas antigas antes da contratação do eNotas</div>
+              <div class="article-card-sub">Saiba se o seu plano permite a importação de vendas anteriores à contratação</div>
+            </div>
+            <svg class="article-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+
+          <a class="article-card" href="https://atendimento.enotas.com.br/hc/pt-br/articles/35773776262413--Menu-Gerenciar-Plataformas-de-vendas-meios-de-pagamento-integrados-%C3%A0-eNotas" target="_blank">
+            <div class="article-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 7V3M15 7V3"/><path d="M6 7h12v4a6 6 0 0 1-12 0V7z"/><path d="M12 17v4"/></svg>
+            </div>
+            <div class="article-card-body">
+              <div class="article-card-title">Integrar nova plataforma de vendas</div>
+              <div class="article-card-sub">Plataformas de vendas e meios de pagamento integrados à eNotas</div>
+            </div>
+            <svg class="article-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+
+          <a class="article-card" href="https://atendimento.enotas.com.br/hc/pt-br/articles/35773366187533" target="_blank">
+            <div class="article-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            </div>
+            <div class="article-card-body">
+              <div class="article-card-title">Como criar uma nota fiscal manualmente pelo eNotas</div>
+              <div class="article-card-sub">Aprenda a emitir uma nota de forma manual diretamente na plataforma</div>
+            </div>
+            <svg class="article-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+
+          <a class="article-card" href="https://atendimento.enotas.com.br/hc/pt-br/articles/35773348743565" target="_blank">
+            <div class="article-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </div>
+            <div class="article-card-body">
+              <div class="article-card-title">Configurar o tipo de nota para cada produto</div>
+              <div class="article-card-sub">Defina qual tipo de nota fiscal será emitida para cada produto</div>
+            </div>
+            <svg class="article-card-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+
+        </div>
+
+        <!-- Banner de transição para NF-e Produto (aparece só no modo "ambos") -->
+        <div id="step5-product-banner">
+          <div class="banner-title">Próximo passo: configurar NF-e (Produto)</div>
+          <div class="banner-text">Você optou por emitir os dois tipos de nota. Agora vamos partir para a configuração da Nota Fiscal de Produto.</div>
+          <button class="banner-btn" onclick="goToProductGuide()">Vamos lá →</button>
+        </div>
+
+      </div>
+
+    </div><!-- /content-panel -->
+
+    <!-- ── SIDEBAR ─────────────────────────────────────── -->
+    <div class="sidebar">
+      <p class="sidebar-label">Progresso</p>
+
+      <div class="sb-step">
+        <div class="sb-step-row">
+          <div class="sb-icon" id="sb-icon-1">
+            <svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="sb-text active" id="sb-text-1">Credenciamento portal de emissão NFS-e</span>
+        </div>
+        <img src="Progresso-1.jpg" alt="NFS-e" class="sb-img visible" id="sb-img-1">
+      </div>
+
+      <div class="sb-step">
+        <div class="sb-step-row">
+          <div class="sb-icon" id="sb-icon-2">
+            <svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#cccccc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="sb-text" id="sb-text-2">Preenchimento dos dados fiscais</span>
+        </div>
+        <img src="Progresso-2.jpg" alt="Dados fiscais" class="sb-img" id="sb-img-2">
+      </div>
+
+      <div class="sb-step">
+        <div class="sb-step-row">
+          <div class="sb-icon" id="sb-icon-3">
+            <svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#cccccc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="sb-text" id="sb-text-3">Hora de conferir os dados</span>
+        </div>
+        <img src="Progresso-3.jpg" alt="Preenchimento" class="sb-img" id="sb-img-3">
+      </div>
+
+      <div class="sb-step">
+        <div class="sb-step-row">
+          <div class="sb-icon" id="sb-icon-4">
+            <svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#cccccc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="sb-text" id="sb-text-4">Configure o envio das suas notas fiscais</span>
+        </div>
+        <img src="Progresso-4.jpg" alt="Configuração envio" class="sb-img" id="sb-img-4">
+      </div>
+
+      <div class="sb-step">
+        <div class="sb-step-row">
+          <div class="sb-icon" id="sb-icon-5">
+            <svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#cccccc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="sb-text" id="sb-text-5">Emissão nota teste</span>
+        </div>
+        <img src="Progresso-5.jpg" alt="Nota teste" class="sb-img" id="sb-img-5">
+      </div>
+
+      <div class="sb-step">
+        <div class="sb-step-row">
+          <div class="sb-icon" id="sb-icon-6">
+            <svg viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#cccccc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="sb-text" id="sb-text-6">Configurações adicionais</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /card-body -->
+
+  <!-- FOOTER -->
+  <div class="card-footer">
+    <div class="progress-track">
+      <div class="progress-fill" id="progress-fill" style="width: 50%"></div>
+    </div>
+    <div class="footer-buttons">
+      <button class="btn-back" id="btn-back" onclick="prevStep()">Voltar</button>
+      <button class="btn-next" id="btn-next" onclick="nextStep()">Continuar</button>
+    </div>
+  </div>
+
+</div><!-- /card -->
+
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  MODAL 1 — Credenciamento Portal Nacional              -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-credenciamento">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">Como credenciar sua empresa no Portal Nacional</span>
+      <button class="modal-close" onclick="closeModal('modal-credenciamento')">×</button>
+    </div>
+    <div class="modal-body">
+      <p>
+        Para que a emissão de NFS-e Nacional ocorra, é necessário que a empresa realize
+        o credenciamento no Portal Nacional. Em caso de dúvidas sobre aspectos fiscais,
+        consulte a sua contabilidade.
+      </p>
+      <ol class="modal-steps">
+        <li><span>Acesse o <a href="https://www.nfse.gov.br/EmissorNacional/Login?ReturnUrl=%2fEmissorNacional" target="_blank">Portal de Gestão NFS-e</a>.</span></li>
+        <li><span>Clique em <strong>"Fazer primeiro acesso"</strong>.</span></li>
+        <li><span>Selecione a opção <strong>"CNPJ"</strong>, preencha as informações solicitadas e clique em <strong>"Avançar"</strong>.</span></li>
+        <li><span>Se você realizou a declaração de IRPF, será solicitado o número do recibo. Caso contrário, será pedido o número do seu título de eleitor. Preencha e clique em <strong>"Avançar"</strong>.</span></li>
+        <li><span>Informe o e-mail para receber o código de autenticação e a senha que deseja utilizar para acessar o Portal Nacional e clique em <strong>"Avançar"</strong>.</span></li>
+        <li><span>Acesse seu e-mail e copie o código numérico enviado para validar o cadastro.</span></li>
+        <li><span>Cole o código no campo indicado e clique em <strong>"Avançar"</strong>.</span></li>
+        <li><span>Clique em <strong>"Fazer login"</strong>.</span></li>
+        <li><span>Informe os dados que utilizou para criar o acesso e clique em <strong>"Entrar"</strong>.</span></li>
+        <li><span>Clique no ícone de engrenagem (⚙️) na parte superior direita da tela.</span></li>
+        <li><span>Preencha os campos de e-mail e telefone.</span></li>
+        <li><span>Verifique com a contabilidade da empresa qual opção deve ser assinalada no campo referente às informações de tributos destacados na nota fiscal.</span></li>
+        <li><span>Clique em <strong>"Salvar"</strong>.</span></li>
+      </ol>
+      <div class="img-wrap" style="max-width:420px;margin-top:16px;">
+        <img src="gif-1.gif" alt="Demonstração do credenciamento" style="width:100%;border-radius:8px;border:1px solid #eeeeee;display:block;">
+        <button class="img-zoom-btn" onclick="openLightbox('gif-1.gif')"><svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+    </div>
+    <div class="modal-footer-btn">
+      <button onclick="closeModal('modal-credenciamento')">Entendido, voltar ao guia</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  MODAL 2 — Como baixar PDF ou XML do Portal Nacional  -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-download-nf">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">Como baixar o PDF ou XML de uma nota emitida</span>
+      <button class="modal-close" onclick="closeModal('modal-download-nf')">×</button>
+    </div>
+    <div class="modal-body">
+      <p>
+        Para utilizar o preenchimento automático dos dados fiscais no eNotas, você precisará
+        de uma nota fiscal emitida nos últimos 30 dias. Veja abaixo como localizá-la e fazer
+        o download diretamente no Portal Nacional:
+      </p>
+      <ol class="modal-steps">
+        <li><span>Acesse o <a href="https://www.nfse.gov.br/EmissorNacional/Login?ReturnUrl=%2fEmissorNacional" target="_blank">Portal de Gestão NFS-e</a> e faça login com suas credenciais.</span></li>
+        <li><span>No menu que está no canto superior direito, clique em <strong>"NFS-e Emitidas"</strong>.</span></li>
+        <li><span>Localize a nota fiscal emitida nos últimos 30 dias com o serviço que será utilizado no eNotas.</span></li>
+        <li><span>Clique nos três pontinhos que estão à direita.</span></li>
+        <li><span>Para baixar o PDF: clique no botão <strong>"Download DANFS-e"</strong> e salve o arquivo em seu computador.</span></li>
+        <li><span>Para baixar o XML: clique em <strong>"Download XML"</strong> e salve o arquivo.</span></li>
+        <li><span>Com o arquivo em mãos, volte ao eNotas e utilize a opção <strong>"Importar nota fiscal"</strong> para carregar os dados automaticamente.</span></li>
+      </ol>
+      <div class="img-wrap" style="max-width:420px;margin-top:16px;">
+        <img src="gif-2.gif" alt="Demonstração de download da nota fiscal" style="width:100%;border-radius:8px;border:1px solid #eeeeee;display:block;">
+        <button class="img-zoom-btn" onclick="openLightbox('gif-2.gif')"><svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      </div>
+    </div>
+    <div class="modal-footer-btn">
+      <button onclick="closeModal('modal-download-nf')">Entendido, voltar ao guia</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  MODAL 3 — Redirecionamento para configuração externa  -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-redirect">
+  <div class="modal-box" style="max-width:420px;">
+    <div class="modal-header">
+      <span class="modal-title">Você será redirecionado a outro link</span>
+      <button class="modal-close" onclick="closeModal('modal-redirect')">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin-bottom:0;">
+        Para configurar esse tipo de emissão, você será direcionado ao
+        Guia de Configurações eNotas em uma nova página.
+      </p>
+    </div>
+    <div class="modal-footer-btn">
+      <button onclick="goToExternalConfig()">OK</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  LIGHTBOX                                              -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox(event)">
+  <div class="lightbox-inner">
+    <img src="" id="lightbox-img" alt="Imagem ampliada">
+    <button class="lightbox-close" onclick="closeLightbox()">×</button>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="tip-overlay" id="tip-overlay" onclick="closeTip(event)">
+  <div class="tip-popup" id="tip-popup">
+    <div class="tip-popup-inner">
+      <span class="tip-popup-text">Se for tirada uma foto do documento original, pode ser que o sistema não faça a leitura correta.</span>
+      <button class="tip-popup-close" onclick="closeTip(event)">×</button>
+    </div>
+  </div>
+</div>
+
+<div class="tip-overlay" id="tip-overlay-2" onclick="closeTip2(event)">
+  <div class="tip-popup">
+    <div class="tip-popup-inner">
+      <span class="tip-popup-text" style="white-space:normal;">Caso ainda não possua um certificado digital,<br>você pode adquirir o seu <a href="https://enotas.com.br/certificado/brasil-certificados-digitais/" target="_blank" style="color:#111111;font-weight:600;">clicando aqui</a>.</span>
+      <button class="tip-popup-close" onclick="closeTip2(event)">×</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--  TUTORIAL CAMPOS FISCAIS                               -->
+<!-- ══════════════════════════════════════════════════════ -->
+<div class="tutorial-overlay" id="tutorial-overlay" onclick="closeTutorial(event)">
+  <div class="tutorial-box" onclick="event.stopPropagation()">
+
+    <!-- HEADER -->
+    <div class="tutorial-header">
+      <div class="tutorial-header-left">
+        <span class="tutorial-badge">Tutorial</span>
+        <span class="tutorial-step-label" id="tut-step-label">Passo 1 de 6</span>
+      </div>
+      <div class="tutorial-header-title" id="tut-header-title">Inscrição Municipal</div>
+      <button class="tut-btn-fullscreen" id="tut-btn-fullscreen" onclick="toggleTutorialFullscreen()" title="Tela cheia">
+        <svg id="tut-fs-icon-expand" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+        <svg id="tut-fs-icon-compress" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2" style="display:none"><path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/></svg>
+      </button>
+      <button class="tutorial-close" onclick="closeTutorial()">×</button>
+    </div>
+
+    <!-- BODY: 3 columns -->
+    <div class="tutorial-body">
+
+      <!-- COL 1: eNotas PDF form -->
+      <div class="tut-col-form">
+        <div class="tut-form-wrap" id="tut-form-wrap">
+          <img src="Preenchimento_Manual.jpg" alt="Formulário eNotas" class="tut-form-img" id="tut-form-img">
+          <div class="tut-form-highlight" id="tut-form-hl"></div>
+          <!-- CALIBRATION OVERLAY — remove after calibrating -->
+          <div id="calib-box" style="display:none;position:absolute;inset:0;z-index:99;cursor:crosshair;" onclick="calibClick(event)"></div>
+          <div id="calib-info" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#111;color:#fff;font-family:monospace;font-size:13px;padding:10px 18px;border-radius:8px;z-index:9999;white-space:pre;pointer-events:none;"></div>
+        </div>
+      </div>
+
+      <!-- COL 2: Nota Fiscal zoomed -->
+      <div class="tut-col-nf" style="position:relative;">
+        <div class="tut-nf-label">Localização na Nota Fiscal</div>
+        <div class="tut-nf-zoom-wrap" id="tut-nf-zoom-wrap">
+          <img src="nota_fiscal.jpg" alt="Nota Fiscal" class="tut-nf-zoom-img" id="tut-nf-zoom-img">
+          <div class="tut-nf-hl" id="tut-nf-hl"></div>
+          <!-- NF CALIBRATION OVERLAY -->
+          <div id="calib-nf-box" style="display:none;position:absolute;inset:0;z-index:99;cursor:crosshair;" onclick="calibNFClick(event)"></div>
+          <div id="calib-nf-info" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1a1a2e;color:#fff;font-family:monospace;font-size:13px;padding:10px 18px;border-radius:8px;z-index:9999;white-space:pre;pointer-events:none;"></div>
+        </div>
+        <div class="tut-nf-caption" id="tut-nf-caption"></div>
+      </div>
+
+      <!-- COL 3: Description -->
+      <div class="tut-col-desc">
+        <div class="tut-desc-field-name" id="tut-desc-name"></div>
+        <div class="tut-desc-text" id="tut-desc-text"></div>
+        <div class="tut-desc-note" id="tut-desc-note" style="display:none"></div>
+      </div>
+
+    </div><!-- /tutorial-body -->
+
+    <!-- FOOTER -->
+    <div class="tutorial-footer">
+      <div class="tut-dots" id="tut-dots"></div>
+      <div class="tut-nav">
+        <button class="tut-btn-back" id="tut-btn-back" onclick="tutNav(-1)">Anterior</button>
+        <button class="tut-btn-next" id="tut-btn-next" onclick="tutNav(1)">Próximo</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════ -->
+<script>
+  let currentStep = 1;
+  const totalSteps = 6;
+
+  // ── FLOW STATE ─────────────────────────────────────────
+  let selectedTypes = { servico: false, produto: false, outro: false };
+
+  function startFlow() {
+    // Card is already in mode-type (type selection ready behind welcome)
+    // Just hide the welcome screen to reveal it
+    document.getElementById('screen-welcome').classList.add('hidden');
+    // Remove after transition so it doesn't block clicks
+    setTimeout(() => {
+      document.getElementById('screen-welcome').style.display = 'none';
+    }, 450);
+  }
+
+  function selectType(type) {
+    selectedTypes.servico = false;
+    selectedTypes.outro = false;
+    selectedTypes[type] = true;
+    document.getElementById('type-servico').classList.toggle('selected', type === 'servico');
+    document.getElementById('type-outro').classList.toggle('selected', type === 'outro');
+    document.getElementById('type-error').style.display = 'none';
+  }
+
+  // ── TRANSITION HELPER ──────────────────────────────────
+  function withTransition(fn) {
+    const overlay = document.getElementById('step-overlay');
+    overlay.classList.add('fading');
+    setTimeout(() => {
+      fn();
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        overlay.classList.remove('fading');
+      }));
+    }, 300);
+  }
+
+  // navToStep: adds transition, then calls goToStep
+  function navToStep(n) {
+    if (n === currentStep) return;
+    withTransition(() => goToStep(n));
+  }
+
+  function confirmType() {
+    if (!selectedTypes.servico && !selectedTypes.outro) {
+      document.getElementById('type-error').style.display = 'block';
+      return;
+    }
+    if (selectedTypes.outro) {
+      openModal('modal-redirect');
+      return;
+    }
+    withTransition(() => {
+      document.querySelector('.card').classList.remove('mode-type');
+      goToStep(1);
+    });
+  }
+
+  function goToExternalConfig() {
+    window.open('https://enotas.com.br/guiaconfiguracoes/?etapa=2', '_blank');
+  }
+
+  function goToProductGuide() {
+    withTransition(() => {
+      document.querySelector('.card').classList.add('mode-product');
+    });
+  }
+
+  function finishGuide() {
+    const welcome = document.getElementById('screen-welcome');
+    welcome.style.display = '';
+    withTransition(() => {
+      document.querySelector('.card').classList.remove('mode-product');
+      document.querySelector('.card').classList.add('mode-type');
+      selectedTypes = { servico: false, produto: false, outro: false };
+      document.getElementById('type-servico').classList.remove('selected');
+      document.getElementById('type-outro').classList.remove('selected');
+      document.getElementById('type-error').style.display = 'none';
+      goToStep(1);
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        welcome.classList.remove('hidden');
+      }));
+    });
+  }
+
+  function openLightbox(src) {
+    document.getElementById('lightbox-img').src = src;
+    document.getElementById('lightbox').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox(e) {
+    if (e && e.target !== document.getElementById('lightbox') && e.target !== document.querySelector('.lightbox-close')) return;
+    document.getElementById('lightbox').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+
+  function openTip(e) {
+    e.stopPropagation();
+    document.getElementById('tip-overlay').classList.add('open');
+  }
+
+  function closeTip(e) {
+    e.stopPropagation();
+    document.getElementById('tip-overlay').classList.remove('open');
+  }
+
+  // ── TUTORIAL CAMPOS FISCAIS ───────────────────────────
+  // form: highlight on Preenchimento_Manual.jpg (% of image)
+  //   top, left, w, h — as % of image dimensions
+  // nf: zoom area on nota_fiscal.jpg
+  //   cx, cy = center of field as % of image; scale = zoom level (1 = fit width)
+  const tutorialFields = [
+    {
+      // Passo 0: Visão geral — nota fiscal inteira, sem highlight
+      name: 'Visão geral da Nota Fiscal',
+      text: 'Esta é a sua NFS-e emitida pelo Portal Nacional. Nos próximos passos vamos identificar cada campo que precisa ser preenchido no eNotas.',
+      note: null,
+      caption: 'NFS-e — Nota Fiscal de Serviço Eletrônica',
+      form: { top: 0, left: 0, w: 0, h: 0 },
+      nf:   { cx: 50, cy: 50, scale: 1, hlW: 0, hlH: 0 }
+    },
+    {
+      name: 'Inscrição Municipal',
+      text: 'A inscrição municipal identifica sua empresa junto à prefeitura. Ela pode ser localizada diretamente na sua NFS-e já emitida, dentro do bloco <strong>EMITENTE DA NFS-e</strong>.',
+      note: '* Se o campo aparecer com um hífen ("-") na sua NFS-e emitida, preencha como "0" no eNotas. Esse número também consta no alvará de funcionamento ou pode ser obtido na prefeitura.',
+      caption: 'EMITENTE DA NFS-e → campo "Inscrição Municipal"',
+      form: { top: 23, left: 0, w: 100, h: 11 },
+      nf:   { cx: 55.2, cy: 14.9, scale: 2, hlW: 0.121, hlH: 0.016 }
+    },
+    {
+      name: 'Código de Tributação Nacional',
+      text: 'O Código de Tributação Nacional está disponível dentro dos campos de <strong>Serviço Prestado</strong> da sua NFS-e já emitida.',
+      note: '* Esse código segue a <a href="https://www.gov.br/nfse/pt-br/mei-e-demais-empresas/codigos-de-tributacao-nacional-nbs" target="_blank">tabela de tributação nacional de serviços</a>.',
+      caption: 'SERVIÇO PRESTADO → "Código de Tributação Nacional"',
+      form: { top: 31, left: 0, w: 100, h: 16 },
+      nf:   { cx: 10.8, cy: 36.1, scale: 2.5, hlW: 0.173, hlH: 0.025 }
+    },
+    {
+      name: 'Código de Tributação Municipal',
+      text: 'O Código de Tributação Municipal também está disponível dentro dos campos de <strong>Serviço Prestado</strong> na sua NFS-e emitida.',
+      note: '* Cada município tem sua própria codificação de serviços. Este código complementa o código nacional e é específico da prefeitura onde sua empresa é registrada.',
+      caption: 'SERVIÇO PRESTADO → "Código de Tributação Municipal"',
+      form: { top: 45.9, left: 0.7, w: 47.5, h: 7.6 },
+      nf:   { cx: 34.7, cy: 36.0, scale: 1.8, hlW: 0.180, hlH: 0.021 }
+    },
+    {
+      name: 'Alíquota de ISS',
+      text: 'O campo Alíquota ISS está localizado dentro de <strong>Tributação Municipal</strong>, identificado como <strong>"Alíquota Aplicada"</strong> na sua nota fiscal emitida.',
+      note: '* A alíquota do ISS varia por município (geralmente entre 2% e 5%).',
+      caption: 'TRIBUTAÇÃO MUNICIPAL → "Alíquota Aplicada"',
+      form: { top: 46.1, left: 50.8, w: 47.5, h: 7.6 },
+      nf:   { cx: 31.3, cy: 50.8, scale: 2.5, hlW: 0.106, hlH: 0.019 }
+    },
+    {
+      name: 'Código NBS, Classificação Tributária e Indicador de Operação',
+      text: 'Se aplicável — estão localizados na seção <strong>Informações Complementares</strong> da sua NFS-e já emitida.',
+      note: '* Esses campos são relativos à Reforma Tributária (IBS/CBS). São opcionais dependendo da prefeitura.',
+      caption: 'INFORMAÇÕES COMPLEMENTARES',
+      form: { top: 55.4, left: 0.3, w: 99.4, h: 26.5 },
+      nf:   { cx: 14.3, cy: 72.3, scale: 1.5, hlW: 0.257, hlH: 0.035 }
+    },
+    {
+      name: 'Percentual aproximado de tributos',
+      text: 'Se aplicável — estão localizados na seção <strong>Totais Aproximados dos Tributos</strong> da sua NFS-e já emitida.',
+      note: null,
+      caption: 'TOTAIS APROXIMADOS DOS TRIBUTOS → Federais, Estaduais, Municipais',
+      form: { top: 83.3, left: 0.3, w: 98.4, h: 10.8 },
+      nf:   { cx: 50, cy: 69, scale: 1.8, hlW: 0.82, hlH: 0.03 }
+    }
+  ];
+
+  let tutStep = 0;
+
+  function openTutorial(e) {
+    if (e) e.stopPropagation();
+    tutStep = 0;
+    renderTutStep();
+    document.getElementById('tutorial-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeTutorial(e) {
+    if (e && e.target !== document.getElementById('tutorial-overlay')) return;
+    document.getElementById('tutorial-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function tutNav(dir) {
+    tutStep = Math.max(0, Math.min(tutorialFields.length - 1, tutStep + dir));
+    renderTutStep();
+  }
+
+  function renderTutStep() {
+    const f = tutorialFields[tutStep];
+    const total = tutorialFields.length;
+    const isIntro = tutStep === 0;
+
+    // Label: passo 0 = "Visão geral", demais = "Passo X de Y"
+    document.getElementById('tut-step-label').textContent = isIntro
+      ? 'Visão geral'
+      : 'Passo ' + tutStep + ' de ' + (total - 1);
+    document.getElementById('tut-header-title').textContent = f.name;
+    document.getElementById('tut-desc-name').textContent = f.name;
+    document.getElementById('tut-desc-text').innerHTML = f.text;
+
+    const noteEl = document.getElementById('tut-desc-note');
+    if (f.note) { noteEl.innerHTML = f.note; noteEl.style.display = 'block'; }
+    else { noteEl.style.display = 'none'; }
+
+    document.getElementById('tut-nf-caption').textContent = f.caption;
+
+    // Esconde highlight do formulário no passo 0
+    const formHl = document.getElementById('tut-form-hl');
+    if (isIntro) {
+      formHl.style.display = 'none';
+      // Reseta imagem do formulário para o topo
+      document.getElementById('tut-form-img').style.top = '0px';
+    } else {
+      formHl.style.display = 'block';
+    }
+
+    // Dots — não mostra o dot do passo 0
+    const dotsEl = document.getElementById('tut-dots');
+    dotsEl.innerHTML = '';
+    for (let i = 1; i < total; i++) {
+      const d = document.createElement('div');
+      d.className = 'tut-dot' + (i === tutStep ? ' active' : '');
+      d.onclick = () => { tutStep = i; renderTutStep(); };
+      dotsEl.appendChild(d);
+    }
+
+    // Buttons
+    document.getElementById('tut-btn-back').style.visibility = tutStep === 0 ? 'hidden' : 'visible';
+    const nextBtn = document.getElementById('tut-btn-next');
+    if (isIntro) {
+      nextBtn.textContent = 'Começar';
+      nextBtn.onclick = () => tutNav(1);
+    } else {
+      nextBtn.textContent = tutStep === total - 1 ? 'Concluir' : 'Próximo';
+      nextBtn.onclick = tutStep === total - 1 ? () => closeTutorial() : () => tutNav(1);
+    }
+
+    // Apply form highlight
+    applyFormHighlight(f.form);
+
+    // Apply NF zoom
+    applyNFZoom(f.nf);
+  }
+
+  function applyFormHighlight(fm) {
+    const img = document.getElementById('tut-form-img');
+    const wrap = document.getElementById('tut-form-wrap');
+    const hl = document.getElementById('tut-form-hl');
+
+    function pos() {
+      // Use the rendered width; height is derived from natural aspect ratio
+      const iw = img.offsetWidth;
+      const natW = img.naturalWidth  || iw;
+      const natH = img.naturalHeight || iw * 1.5;
+      const ih = iw * natH / natW;   // true rendered height (image taller than container)
+
+      hl.style.left   = (fm.left / 100 * iw) + 'px';
+      hl.style.width  = (fm.w    / 100 * iw) + 'px';
+      hl.style.height = (fm.h    / 100 * ih) + 'px';
+
+      // Center the highlight vertically in the container
+      const hlTop  = fm.top / 100 * ih;
+      const hlBot  = (fm.top + fm.h) / 100 * ih;
+      const hlMid  = (hlTop + hlBot) / 2;
+      const wrapH  = wrap.clientHeight;
+      const newTop = wrapH / 2 - hlMid;
+      const clampedTop = Math.min(0, Math.max(wrapH - ih, newTop));
+      img.style.top = clampedTop + 'px';
+
+      // Position highlight relative to the scrolled image top
+      hl.style.top = (clampedTop + hlTop) + 'px';
+    }
+
+    if (img.complete && img.naturalWidth) pos();
+    else img.onload = pos;
+    setTimeout(pos, 80);
+  }
+
+  function applyNFZoom(nf) {
+    const img  = document.getElementById('tut-nf-zoom-img');
+    const wrap = document.getElementById('tut-nf-zoom-wrap');
+    const hl   = document.getElementById('tut-nf-hl');
+
+    function pos() {
+      const cw   = wrap.clientWidth;
+      const ch   = wrap.clientHeight;
+      const natW = img.naturalWidth  || 800;
+      const natH = img.naturalHeight || 1100;
+
+      // Rendered size with object-fit:contain + center
+      const imgAspect  = natW / natH;
+      const wrapAspect = cw / ch;
+      let rendW, rendH, offX, offY;
+      if (imgAspect < wrapAspect) {
+        rendH = ch; rendW = ch * imgAspect;
+        offX = (cw - rendW) / 2; offY = 0;
+      } else {
+        rendW = cw; rendH = cw / imgAspect;
+        offX = 0; offY = (ch - rendH) / 2;
+      }
+
+      const scale = nf.scale || 1;
+
+      // Field center in container coords (before zoom)
+      const fieldX = offX + (nf.cx / 100) * rendW;
+      const fieldY = offY + (nf.cy / 100) * rendH;
+
+      // With transform-origin: 0 0, scale() multiplies all coords by scale.
+      // We want fieldX*scale + tx = cw/2  →  tx = cw/2 - fieldX*scale
+      const tx = cw / 2 - fieldX * scale;
+      const ty = ch / 2 - fieldY * scale;
+
+      img.style.transformOrigin = '0 0';
+      img.style.transform = 'translate(' + tx + 'px, ' + ty + 'px) scale(' + scale + ')';
+
+      // Highlight always at container center
+      if (!nf.hlW || !nf.hlH) {
+        hl.style.display = 'none';
+      } else {
+        const hlW = rendW * nf.hlW * scale;
+        const hlH = rendH * nf.hlH * scale;
+        hl.style.display  = 'block';
+        hl.style.position = 'absolute';
+        hl.style.width    = hlW + 'px';
+        hl.style.height   = hlH + 'px';
+        hl.style.left     = (cw / 2 - hlW / 2) + 'px';
+        hl.style.top      = (ch / 2 - hlH / 2) + 'px';
+      }
+    }
+
+    if (img.complete && img.naturalWidth) pos();
+    else img.onload = pos;
+    setTimeout(pos, 80);
+  }
+
+  // openTip3 / closeTip3 now open the tutorial
+  function openTip3(e) {
+    if (e) e.stopPropagation();
+    openTutorial(null);
+  }
+  function closeTip3(e) { closeTutorial(null); }
+
+
+  function openTip2(e) {
+    e.stopPropagation();
+    document.getElementById('tip-overlay-2').classList.add('open');
+  }
+
+  function closeTip2(e) {
+    e.stopPropagation();
+    document.getElementById('tip-overlay-2').classList.remove('open');
+  }
+
+  // Recalcula posições quando o browser é redimensionado ou zoom muda
+  let resizeTimer;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() {
+      const overlay = document.getElementById('tutorial-overlay');
+      if (overlay.classList.contains('open')) {
+        applyFormHighlight(tutorialFields[tutStep].form);
+        applyNFZoom(tutorialFields[tutStep].nf);
+      }
+    }, 100);
+  });
+
+  document.addEventListener('keydown', function(ev) {
+    if (ev.key === 'Escape') {
+      document.getElementById('tip-overlay').classList.remove('open');
+      document.getElementById('tip-overlay-2').classList.remove('open');
+      document.getElementById('tip-overlay-3') && document.getElementById('tip-overlay-3').classList.remove('open');
+      document.getElementById('tutorial-overlay').classList.remove('open');
+      document.getElementById('lightbox').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+  });
+
+  // ── CALIBRATION TOOL ─────────────────────────────────
+  let calibActive = false;
+  let calibPoints = [];
+
+  function toggleCalib() {
+    calibActive = !calibActive;
+    const box  = document.getElementById('calib-box');
+    const info = document.getElementById('calib-info');
+    const btn  = document.getElementById('calib-btn');
+    if (calibActive) {
+      box.style.display  = 'block';
+      info.style.display = 'block';
+      info.textContent   = '📍 Clique no CANTO SUPERIOR ESQUERDO do campo';
+      btn.textContent    = '❌ Sair calibração';
+      calibPoints = [];
+    } else {
+      box.style.display  = 'none';
+      info.style.display = 'none';
+      btn.textContent    = '📍 Calibrar';
+      calibPoints = [];
+    }
+  }
+
+  function calibClick(e) {
+    const img  = document.getElementById('tut-form-img');
+    const rect = img.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width  * 100).toFixed(1);
+    const y = ((e.clientY - rect.top)  / rect.height * 100).toFixed(1);
+    const info = document.getElementById('calib-info');
+    calibPoints.push({ x: parseFloat(x), y: parseFloat(y) });
+
+    if (calibPoints.length === 1) {
+      info.textContent = '📍 Ponto 1: left=' + x + '%, top=' + y + '%\nAgora clique no CANTO INFERIOR DIREITO';
+    } else if (calibPoints.length === 2) {
+      const p1 = calibPoints[0], p2 = calibPoints[1];
+      const left = Math.min(p1.x, p2.x).toFixed(1);
+      const top  = Math.min(p1.y, p2.y).toFixed(1);
+      const w    = Math.abs(p2.x - p1.x).toFixed(1);
+      const h    = Math.abs(p2.y - p1.y).toFixed(1);
+      info.textContent = '✅ RESULTADO:\nform: { top: ' + top + ', left: ' + left + ', w: ' + w + ', h: ' + h + ' }\n\nClique novamente para novo campo';
+      calibPoints = [];
+    }
+  }
+
+  // ── CALIBRATION TOOL — NF ────────────────────────────
+  let calibNFActive = false;
+  let calibNFPoints = [];
+
+  function toggleCalibNF() {
+    calibNFActive = !calibNFActive;
+    const box  = document.getElementById('calib-nf-box');
+    const info = document.getElementById('calib-nf-info');
+    const btn  = document.getElementById('calib-nf-btn');
+    const img  = document.getElementById('tut-nf-zoom-img');
+    const wrap = document.getElementById('tut-nf-zoom-wrap');
+
+    if (calibNFActive) {
+      box.style.display  = 'block';
+      info.style.display = 'block';
+      info.textContent   = '📍 NF: Clique no CANTO SUPERIOR ESQUERDO do campo';
+      btn.textContent    = '❌ Sair calibração NF';
+      calibNFPoints = [];
+      // Reseta zoom para ver imagem inteira
+      img.style.transform       = 'translate(0,0) scale(1)';
+      img.style.transformOrigin = '0 0';
+      document.getElementById('tut-nf-hl').style.display = 'none';
+    } else {
+      box.style.display  = 'none';
+      info.style.display = 'none';
+      btn.textContent    = '📍 Calibrar NF';
+      calibNFPoints = [];
+      // Restaura zoom do passo atual
+      applyNFZoom(tutorialFields[tutStep].nf);
+    }
+  }
+
+  function calibNFClick(e) {
+    const img  = document.getElementById('tut-nf-zoom-img');
+    const wrap = document.getElementById('tut-nf-zoom-wrap');
+    const info = document.getElementById('calib-nf-info');
+
+    const natW = img.naturalWidth  || 800;
+    const natH = img.naturalHeight || 1100;
+    const cw   = wrap.clientWidth;
+    const ch   = wrap.clientHeight;
+
+    // Calc rendered size with object-fit:contain
+    const imgAspect  = natW / natH;
+    const wrapAspect = cw / ch;
+    let rendW, rendH, offX, offY;
+    if (imgAspect < wrapAspect) {
+      rendH = ch; rendW = ch * imgAspect;
+      offX = (cw - rendW) / 2; offY = 0;
+    } else {
+      rendW = cw; rendH = cw / imgAspect;
+      offX = 0; offY = (ch - rendH) / 2;
+    }
+
+    const wrapRect = wrap.getBoundingClientRect();
+    const relX = e.clientX - wrapRect.left - offX;
+    const relY = e.clientY - wrapRect.top  - offY;
+    const cx = (relX / rendW * 100).toFixed(1);
+    const cy = (relY / rendH * 100).toFixed(1);
+
+    calibNFPoints.push({ x: parseFloat(cx), y: parseFloat(cy) });
+
+    if (calibNFPoints.length === 1) {
+      info.textContent = '📍 Ponto 1: cx=' + cx + '%, cy=' + cy + '%\nAgora clique no CANTO INFERIOR DIREITO';
+    } else if (calibNFPoints.length === 2) {
+      const p1 = calibNFPoints[0], p2 = calibNFPoints[1];
+      const centerX = ((p1.x + p2.x) / 2).toFixed(1);
+      const centerY = ((p1.y + p2.y) / 2).toFixed(1);
+      const hlW = (Math.abs(p2.x - p1.x) / 100).toFixed(3);
+      const hlH = (Math.abs(p2.y - p1.y) / 100).toFixed(3);
+      info.textContent =
+        '✅ NF RESULTADO:\ncx: ' + centerX + ', cy: ' + centerY +
+        '\nhlW: ' + hlW + ', hlH: ' + hlH +
+        '\n\nClique novamente para novo campo';
+      calibNFPoints = [];
+    }
+  }
+
+  function toggleTutorialFullscreen() {
+    const overlay = document.getElementById('tutorial-overlay');
+    const box     = document.querySelector('.tutorial-box');
+    const expand  = document.getElementById('tut-fs-icon-expand');
+    const compress= document.getElementById('tut-fs-icon-compress');
+    const isFS    = box.classList.contains('fullscreen');
+
+    box.classList.toggle('fullscreen', !isFS);
+    overlay.classList.toggle('fullscreen-mode', !isFS);
+    expand.style.display   = isFS ? 'block' : 'none';
+    compress.style.display = isFS ? 'none'  : 'block';
+
+    // Re-render para recalcular posições com novo tamanho
+    setTimeout(() => renderTutStep(), 320);
+  }
+
+  function toggleAcc(n) {
+    const body = document.getElementById('acc-body-' + n);
+    const acc  = document.getElementById('acc-' + n);
+    const isOpen = body.classList.contains('open');
+
+    // Close all
+    document.querySelectorAll('.accordion-body').forEach(b => b.classList.remove('open'));
+    document.querySelectorAll('.accordion').forEach(a => a.classList.remove('open'));
+
+    // Open clicked if it was closed
+    if (!isOpen) {
+      body.classList.add('open');
+      acc.classList.add('open');
+    }
+  }
+
+  function goToStep(n) {
+    if (n < 1 || n > totalSteps) return;
+
+    // Reflete a etapa atual na URL (?etapa=N), sem recarregar a página
+    // (só depois que o usuário já saiu da tela de boas-vindas)
+    const welcomeScreen = document.getElementById('screen-welcome');
+    if (welcomeScreen && welcomeScreen.classList.contains('hidden')) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('etapa', n);
+      window.history.replaceState(null, '', url);
+    }
+
+    // Hide all pages
+    document.querySelectorAll('.step-page').forEach(p => p.classList.remove('active'));
+    document.getElementById('step-' + n).classList.add('active');
+
+    // Update stepper circles
+    for (let i = 1; i <= totalSteps; i++) {
+      const circle = document.getElementById('circle-' + i);
+      const line   = document.getElementById('line-' + i);
+      circle.classList.remove('active', 'done', 'inactive');
+
+      if (i < n)  circle.classList.add('done');
+      else if (i === n) circle.classList.add('active');
+      else circle.classList.add('inactive');
+
+      if (line) {
+        if (i < n) line.classList.add('done');
+        else line.classList.remove('done');
+      }
+    }
+
+    // Update sidebar
+    for (let i = 1; i <= totalSteps; i++) {
+      const icon = document.getElementById('sb-icon-' + i);
+      const text = document.getElementById('sb-text-' + i);
+      icon.classList.remove('active', 'done');
+      text.classList.remove('active', 'done');
+
+      const svgPath = icon.querySelector('path');
+
+      if (i < n) {
+        icon.classList.add('done');
+        text.classList.add('done');
+        svgPath.setAttribute('stroke', '#ffffff');
+      } else if (i === n) {
+        icon.classList.add('active');
+        text.classList.add('active');
+        svgPath.setAttribute('stroke', '#ffffff');
+      } else {
+        svgPath.setAttribute('stroke', '#cccccc');
+      }
+    }
+
+    // Progress bar
+    document.getElementById('progress-fill').style.width = (n / totalSteps * 100) + '%';
+
+    // Sidebar images — show only the active step's image
+    for (let i = 1; i <= totalSteps; i++) {
+      const img = document.getElementById('sb-img-' + i);
+      if (img) {
+        if (i === n) img.classList.add('visible');
+        else img.classList.remove('visible');
+      }
+    }
+
+    // Back button always visible (step 1 → type selection, others → previous step)
+    document.getElementById('btn-back').style.visibility = 'visible';
+
+    // Next button label — on step 5 always show "Concluir"
+    if (n === totalSteps) {
+      document.getElementById('btn-next').style.display = '';
+      document.getElementById('btn-next').textContent = 'Concluir';
+    } else {
+      document.getElementById('btn-next').style.display = '';
+      document.getElementById('btn-next').textContent = 'Continuar';
+    }
+
+    // Product banner on last step only in "both" mode
+    const banner = document.getElementById('step5-product-banner');
+    if (banner) {
+      if (n === totalSteps && selectedTypes.servico && selectedTypes.produto) {
+        banner.classList.add('visible');
+      } else {
+        banner.classList.remove('visible');
+      }
+    }
+
+    currentStep = n;
+  }
+
+  function nextStep() {
+    if (currentStep < totalSteps) {
+      withTransition(() => goToStep(currentStep + 1));
+    } else {
+      // Step 5: "Concluir" always returns to welcome
+      finishGuide();
+    }
+  }
+
+  function prevStep() {
+    if (currentStep === 1) {
+      // Step 1 → back to type selection
+      withTransition(() => {
+        document.querySelector('.card').classList.add('mode-type');
+      });
+    } else {
+      withTransition(() => goToStep(currentStep - 1));
+    }
+  }
+
+  function openModal(id) {
+    document.getElementById(id).classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // Close modal on overlay click
+  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', function(e) {
+      if (e.target === this) closeModal(this.id);
+    });
+  });
+
+  // Close modal on ESC
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-overlay.open').forEach(m => closeModal(m.id));
+    }
+  });
+
+  // Init — welcome screen is on top (z-index:9999), card is in mode-type behind it.
+  // goToStep pre-initializes sidebar/stepper state before the user sees anything.
+  document.querySelector('.card').classList.add('mode-type');
+  goToStep(1);
+
+  // ── DEEP LINK: ?etapa=N abre direto na etapa N (1 a 6), pulando a tela inicial ──
+  (function () {
+    const params = new URLSearchParams(window.location.search);
+    const etapa = parseInt(params.get('etapa'), 10);
+    if (etapa >= 1 && etapa <= totalSteps) {
+      document.getElementById('screen-welcome').classList.add('hidden');
+      document.getElementById('screen-welcome').style.display = 'none';
+      selectedTypes.servico = true;
+      document.getElementById('type-servico').classList.add('selected');
+      document.querySelector('.card').classList.remove('mode-type');
+      goToStep(etapa);
+    }
+  })();
+</script>
+
+</body>
+</html>
